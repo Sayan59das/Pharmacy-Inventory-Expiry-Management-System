@@ -46,7 +46,7 @@ READ ORDER  : after docs/reading_order.md.
 
 ### Member 3 - Automation & Tests
 * The 5 triggers: BEFORE vs AFTER, `NEW`/`OLD`, `SIGNAL SQLSTATE '45000'`, and the chain "sale line -> stock reduced -> LOW_STOCK alert".
-* The 9 procedures: `IN`/`OUT` parameters, `DELIMITER`, transactions with `START TRANSACTION`/`COMMIT`/`ROLLBACK`, the `EXIT HANDLER` + `RESIGNAL`, the cursor loops, `JSON_TABLE`.
+* The 9 procedures: `IN`/`OUT` parameters, `DELIMITER`, transactions with `START TRANSACTION`/`COMMIT`/`ROLLBACK`, the `EXIT HANDLER` + `RESIGNAL`, the `WHILE` loops (FEFO and JSON items), `JSON_TABLE`.
 * **FEFO** (`sp_add_medicine_to_sale`): order by expiry, split across batches, `FOR UPDATE` locking, why expired batches are skipped.
 * ACID with our examples: what happens when the 2nd item of a purchase or a bill fails (test C2, C10).
 * The event: what it is, why a trigger cannot do the same job, how to switch the scheduler on and check it (`SHOW VARIABLES LIKE 'event_scheduler'`).

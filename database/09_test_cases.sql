@@ -15,16 +15,17 @@
 --
 -- HOW TO READ A TEST
 --   * "EXPECTED:" comments say what must happen.
---   * Tests that must FAIL show an ERROR 1644 (45000) message - that is the CORRECT result.
---     Afterwards a PASS/FAIL check proves that nothing was changed (all-or-nothing).
+--   * NEGATIVE TESTS (18 of them) try something that MUST be refused, e.g. selling expired
+--     stock. They run through the helper procedure sp_test_expect_error, which CATCHES the
+--     error and writes PASS when MySQL refused with the expected message (FAIL otherwise).
+--     So the file shows NO red errors: a refused action is a PASS row.
+--     Afterwards another PASS/FAIL check proves that nothing was changed (all-or-nothing).
 --   * The tests that need START TRANSACTION ... ROLLBACK leave the database untouched.
 --
 -- HOW TO RUN
---   Command line (continues after the expected errors):
---         mysql -u root -p --force < 09_test_cases.sql
---   MySQL Workbench: it stops at the first error. Select ONE test block and run it
---   with Ctrl+Shift+Enter. If a block stopped in the middle of a transaction, type
---   ROLLBACK; and run it.
+--   Command line :  mysql -u root -p < 09_test_cases.sql
+--   Workbench    :  open the file and run everything (Ctrl+Shift+Enter).
+--   The last two result tables are the summary. EXPECTED: 63 PASS, 0 FAIL.
 -- =====================================================================
 
 USE pharmacy_db;
@@ -38,9 +39,48 @@ DROP TEMPORARY TABLE IF EXISTS test_results;
 CREATE TEMPORARY TABLE test_results (
     seq          INT AUTO_INCREMENT PRIMARY KEY,   -- keeps the tests in the order they ran
     test_id      VARCHAR(10),                      -- e.g. A1, B3
-    description  VARCHAR(160),                     -- what was checked
+    description  VARCHAR(255),                     -- what was checked
     result       VARCHAR(4)                        -- PASS or FAIL
 ) ENGINE = MyISAM;
+
+-- ---------------------------------------------------------------------
+-- Helper for the NEGATIVE tests: sp_test_expect_error
+--   p_test_id     the test name, e.g. 'B2'
+--   p_sql         the statement that MUST fail, written as text
+--   p_expected    a piece of the error message we expect
+-- It runs p_sql, catches the error, and writes one PASS/FAIL row.
+--   PREPARE / EXECUTE      = run SQL that is stored in a text (dynamic SQL)
+--   CONTINUE HANDLER       = on an error, run the handler and then simply carry on
+--   GET DIAGNOSTICS        = read the message of the error that just happened
+-- This procedure is only for testing; it is dropped again at the end of this file.
+-- ---------------------------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_test_expect_error;
+DELIMITER $$
+CREATE PROCEDURE sp_test_expect_error(
+    IN p_test_id   VARCHAR(10),
+    IN p_sql       TEXT,
+    IN p_expected  VARCHAR(255)
+)
+BEGIN
+    DECLARE v_error VARCHAR(255) DEFAULT NULL;      -- the error message MySQL gave (NULL = no error)
+
+    -- If the statement fails, store its message in v_error and continue.
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+        GET DIAGNOSTICS CONDITION 1 v_error = MESSAGE_TEXT;
+
+    -- Run the statement. PREPARE needs a user variable (@...), not a local one.
+    SET @test_sql = p_sql;
+    PREPARE test_statement FROM @test_sql;
+    EXECUTE test_statement;
+    DEALLOCATE PREPARE test_statement;
+
+    -- PASS = there WAS an error and its message contains the expected text.
+    INSERT INTO test_results (test_id, description, result)
+    VALUES (p_test_id,
+            LEFT(CONCAT('refused as expected -> MySQL said: ', COALESCE(v_error, '(no error!)')), 255),
+            IF(v_error IS NOT NULL AND LOCATE(p_expected, v_error) > 0, 'PASS', 'FAIL'));
+END$$
+DELIMITER ;
 
 
 -- #####################################################################
@@ -125,10 +165,12 @@ SELECT 'B1b', 'ROLLBACK restores the stock to 150',
 -- ---------------------------------------------------------------------
 START TRANSACTION;
 INSERT INTO purchase (supplier_id, invoice_no, purchase_date) VALUES (4, 'INV-TEST-B2', CURDATE());
-INSERT INTO purchase_item (purchase_id, batch_id, quantity, unit_cost) VALUES (LAST_INSERT_ID(), 1, 5, 20.00);
+CALL sp_test_expect_error('B2',
+     "INSERT INTO purchase_item (purchase_id, batch_id, quantity, unit_cost) VALUES (LAST_INSERT_ID(), 1, 5, 20.00)",
+     'Supplier mismatch');
 ROLLBACK;
 INSERT INTO test_results (test_id, description, result)
-SELECT 'B2', 'purchase_item with a batch of another supplier was refused (nothing saved)',
+SELECT 'B2b', 'purchase_item with a batch of another supplier was refused (nothing saved)',
        IF(COUNT(*) = 0, 'PASS', 'FAIL') FROM purchase WHERE invoice_no = 'INV-TEST-B2';
 
 -- ---------------------------------------------------------------------
@@ -140,10 +182,12 @@ SET @sales_before = (SELECT COUNT(*) FROM sale);
 SET @items_before = (SELECT COUNT(*) FROM sale_item);
 START TRANSACTION;
 INSERT INTO sale (customer_id, payment_mode) VALUES (NULL, 'CASH');
-INSERT INTO sale_item (sale_id, batch_id, quantity, unit_price, gst_percent) VALUES (LAST_INSERT_ID(), 1, 1, 28.00, 5.00);
+CALL sp_test_expect_error('B3',
+     "INSERT INTO sale_item (sale_id, batch_id, quantity, unit_price, gst_percent) VALUES (LAST_INSERT_ID(), 1, 1, 28.00, 5.00)",
+     'Cannot sell batch PCM-23K');
 ROLLBACK;
 INSERT INTO test_results (test_id, description, result)
-SELECT 'B3', 'sale_item for an EXPIRED batch was refused (no sale, no item saved)',
+SELECT 'B3b', 'sale_item for an EXPIRED batch was refused (no sale, no item saved)',
        IF((SELECT COUNT(*) FROM sale) = @sales_before AND (SELECT COUNT(*) FROM sale_item) = @items_before
           AND (SELECT quantity_in_stock FROM batch WHERE batch_id = 1) = 14, 'PASS', 'FAIL');
 
@@ -154,10 +198,12 @@ SELECT 'B3', 'sale_item for an EXPIRED batch was refused (no sale, no item saved
 -- ---------------------------------------------------------------------
 START TRANSACTION;
 INSERT INTO sale (customer_id, payment_mode) VALUES (NULL, 'CASH');
-INSERT INTO sale_item (sale_id, batch_id, quantity, unit_price, gst_percent) VALUES (LAST_INSERT_ID(), 8, 24, 22.00, 5.00);
+CALL sp_test_expect_error('B4',
+     "INSERT INTO sale_item (sale_id, batch_id, quantity, unit_price, gst_percent) VALUES (LAST_INSERT_ID(), 8, 24, 22.00, 5.00)",
+     'Insufficient stock in batch CTZ-24A: requested 24, available 23');
 ROLLBACK;
 INSERT INTO test_results (test_id, description, result)
-SELECT 'B4', 'sale_item with quantity above the batch stock was refused',
+SELECT 'B4b', 'sale_item with quantity above the batch stock was refused',
        IF((SELECT COUNT(*) FROM sale_item) = @items_before AND (SELECT quantity_in_stock FROM batch WHERE batch_id = 8) = 23, 'PASS', 'FAIL');
 
 -- ---------------------------------------------------------------------
@@ -249,16 +295,18 @@ FROM batch WHERE batch_no = 'AML-26Z';
 -- ---------------------------------------------------------------------
 SET @purchases_before = (SELECT COUNT(*) FROM purchase);
 SET @stock3_before    = (SELECT quantity_in_stock FROM batch WHERE batch_id = 3);
-CALL sp_add_purchase(
-    4, 'INV-TEST-C2', CURDATE(),
-    JSON_ARRAY(
-        JSON_OBJECT('medicine_id', 1, 'batch_no', 'PCM-25A', 'quantity', 5, 'unit_cost', 23.00),
-        JSON_OBJECT('medicine_id', 7, 'batch_no', 'ATV-BAD', 'manufacture_date', '2026-01-01',
-                    'expiry_date', '2028-01-01', 'quantity', 5, 'unit_cost', 90.00, 'selling_price', 10.00)
-    ),
-    @pid_c2);
+CALL sp_test_expect_error('C2',
+     "CALL sp_add_purchase(
+          4, 'INV-TEST-C2', CURDATE(),
+          JSON_ARRAY(
+              JSON_OBJECT('medicine_id', 1, 'batch_no', 'PCM-25A', 'quantity', 5, 'unit_cost', 23.00),
+              JSON_OBJECT('medicine_id', 7, 'batch_no', 'ATV-BAD', 'manufacture_date', '2026-01-01',
+                          'expiry_date', '2028-01-01', 'quantity', 5, 'unit_cost', 90.00, 'selling_price', 10.00)
+          ),
+          @pid_c2)",
+     'chk_batch_price');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C2', 'failed purchase left NOTHING behind (no header, stock unchanged, no new batch)',
+SELECT 'C2b', 'failed purchase left NOTHING behind (no header, stock unchanged, no new batch)',
        IF((SELECT COUNT(*) FROM purchase) = @purchases_before
           AND (SELECT quantity_in_stock FROM batch WHERE batch_id = 3) = @stock3_before
           AND (SELECT COUNT(*) FROM batch WHERE batch_no = 'ATV-BAD') = 0
@@ -268,10 +316,12 @@ SELECT 'C2', 'failed purchase left NOTHING behind (no header, stock unchanged, n
 -- C3 sp_add_purchase - the same supplier invoice number twice is refused.
 -- EXPECTED: ERROR 1062 (23000): Duplicate entry '4-INV-TEST-C1' for key 'purchase.uq_purchase_invoice'
 -- ---------------------------------------------------------------------
-CALL sp_add_purchase(4, 'INV-TEST-C1', CURDATE(),
-     JSON_ARRAY(JSON_OBJECT('medicine_id', 1, 'batch_no', 'PCM-25A', 'quantity', 5, 'unit_cost', 23.00)), @pid_c3);
+CALL sp_test_expect_error('C3',
+     "CALL sp_add_purchase(4, 'INV-TEST-C1', CURDATE(),
+          JSON_ARRAY(JSON_OBJECT('medicine_id', 1, 'batch_no', 'PCM-25A', 'quantity', 5, 'unit_cost', 23.00)), @pid_c3)",
+     'Duplicate entry');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C3', 'duplicate invoice number refused, stock not doubled',
+SELECT 'C3b', 'duplicate invoice number refused, stock not doubled',
        IF((SELECT COUNT(*) FROM purchase) = @purchases_before
           AND (SELECT quantity_in_stock FROM batch WHERE batch_id = 3) = @stock3_before, 'PASS', 'FAIL');
 
@@ -279,9 +329,11 @@ SELECT 'C3', 'duplicate invoice number refused, stock not doubled',
 -- C4 sp_add_purchase - an invoice without items is refused.
 -- EXPECTED: ERROR 1644 (45000): A purchase needs at least one item (items must be a non-empty JSON array)
 -- ---------------------------------------------------------------------
-CALL sp_add_purchase(4, 'INV-TEST-C4', CURDATE(), JSON_ARRAY(), @pid_c4);
+CALL sp_test_expect_error('C4',
+     "CALL sp_add_purchase(4, 'INV-TEST-C4', CURDATE(), JSON_ARRAY(), @pid_c4)",
+     'A purchase needs at least one item');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C4', 'purchase with an empty item list refused',
+SELECT 'C4b', 'purchase with an empty item list refused',
        IF(COUNT(*) = 0, 'PASS', 'FAIL') FROM purchase WHERE invoice_no = 'INV-TEST-C4';
 
 -- ---------------------------------------------------------------------
@@ -316,9 +368,11 @@ FROM sale_item WHERE sale_id = @sale_c5;
 --           No bill is created.
 -- ---------------------------------------------------------------------
 SET @sales_before = (SELECT COUNT(*) FROM sale);
-CALL sp_make_sale(NULL, 2, 31, 'CASH', @sale_c6);
+CALL sp_test_expect_error('C6',
+     "CALL sp_make_sale(NULL, 2, 31, 'CASH', @sale_c6)",
+     'Insufficient stock for Azithromycin 250mg: requested 31, sellable 30');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C6', 'selling more than available was refused, no bill created, stock unchanged',
+SELECT 'C6b', 'selling more than available was refused, no bill created, stock unchanged',
        IF((SELECT COUNT(*) FROM sale) = @sales_before AND @sale_c6 IS NULL
           AND (SELECT SUM(quantity_in_stock) FROM batch WHERE medicine_id = 2) = 30, 'PASS', 'FAIL');
 
@@ -327,9 +381,11 @@ SELECT 'C6', 'selling more than available was refused, no bill created, stock un
 -- Vitamin B-Complex (medicine 13): 18 units, all in an expired batch.
 -- EXPECTED: ERROR 1644 (45000): Insufficient stock for Vitamin B-Complex: requested 1, sellable 0
 -- ---------------------------------------------------------------------
-CALL sp_make_sale(NULL, 13, 1, 'CASH', @sale_c7);
+CALL sp_test_expect_error('C7',
+     "CALL sp_make_sale(NULL, 13, 1, 'CASH', @sale_c7)",
+     'Insufficient stock for Vitamin B-Complex: requested 1, sellable 0');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C7', 'medicine with only expired stock cannot be sold',
+SELECT 'C7b', 'medicine with only expired stock cannot be sold',
        IF((SELECT COUNT(*) FROM sale) = @sales_before AND (SELECT quantity_in_stock FROM batch WHERE batch_id = 23) = 18, 'PASS', 'FAIL');
 
 -- ---------------------------------------------------------------------
@@ -339,12 +395,12 @@ SELECT 'C7', 'medicine with only expired stock cannot be sold',
 --   unknown customer : ERROR 1644 (45000): Customer not found
 --   quantity zero    : ERROR 1644 (45000): Quantity must be at least 1
 -- ---------------------------------------------------------------------
-CALL sp_make_sale(NULL, 999, 1, 'CASH', @sale_c8a);
-CALL sp_make_sale(NULL, 4, 1, 'CHEQUE', @sale_c8b);
-CALL sp_make_sale(999, 4, 1, 'CASH', @sale_c8c);
-CALL sp_make_sale(NULL, 4, 0, 'CASH', @sale_c8d);
+CALL sp_test_expect_error('C8a', "CALL sp_make_sale(NULL, 999, 1, 'CASH', @sale_c8a)",  'Medicine not found');
+CALL sp_test_expect_error('C8b', "CALL sp_make_sale(NULL, 4, 1, 'CHEQUE', @sale_c8b)",  'Payment mode must be CASH, UPI or CARD');
+CALL sp_test_expect_error('C8c', "CALL sp_make_sale(999, 4, 1, 'CASH', @sale_c8c)",     'Customer not found');
+CALL sp_test_expect_error('C8d', "CALL sp_make_sale(NULL, 4, 0, 'CASH', @sale_c8d)",    'Quantity must be at least 1');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C8', 'four invalid sale requests were all refused, no bill created',
+SELECT 'C8e', 'four invalid sale requests were all refused, no bill created',
        IF((SELECT COUNT(*) FROM sale) = @sales_before, 'PASS', 'FAIL');
 
 -- ---------------------------------------------------------------------
@@ -377,12 +433,14 @@ CALL sp_generate_bill(@bill_c9);
 -- ---------------------------------------------------------------------
 SET @sales_before = (SELECT COUNT(*) FROM sale);
 SET @stock8_before = (SELECT quantity_in_stock FROM batch WHERE batch_id = 8);
-CALL sp_make_bill(NULL, 'CASH',
-     JSON_ARRAY(JSON_OBJECT('medicine_id', 4, 'quantity', 1),
-                JSON_OBJECT('medicine_id', 2, 'quantity', 1000)),
-     @bill_c10);
+CALL sp_test_expect_error('C10',
+     "CALL sp_make_bill(NULL, 'CASH',
+          JSON_ARRAY(JSON_OBJECT('medicine_id', 4, 'quantity', 1),
+                     JSON_OBJECT('medicine_id', 2, 'quantity', 1000)),
+          @bill_c10)",
+     'Insufficient stock for Azithromycin 250mg: requested 1000');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C10', 'cart failed on item 2: whole bill rolled back (no bill, Cetirizine stock unchanged)',
+SELECT 'C10b', 'cart failed on item 2: whole bill rolled back (no bill, Cetirizine stock unchanged)',
        IF((SELECT COUNT(*) FROM sale) = @sales_before
           AND (SELECT quantity_in_stock FROM batch WHERE batch_id = 8) = @stock8_before AND @bill_c10 IS NULL, 'PASS', 'FAIL');
 
@@ -390,12 +448,14 @@ SELECT 'C10', 'cart failed on item 2: whole bill rolled back (no bill, Cetirizin
 -- C11 sp_make_bill - the same medicine twice in one cart is refused.
 -- EXPECTED: ERROR 1644 (45000): A medicine appears more than once in the bill - add the quantities together
 -- ---------------------------------------------------------------------
-CALL sp_make_bill(NULL, 'CASH',
-     JSON_ARRAY(JSON_OBJECT('medicine_id', 4, 'quantity', 1),
-                JSON_OBJECT('medicine_id', 4, 'quantity', 2)),
-     @bill_c11);
+CALL sp_test_expect_error('C11',
+     "CALL sp_make_bill(NULL, 'CASH',
+          JSON_ARRAY(JSON_OBJECT('medicine_id', 4, 'quantity', 1),
+                     JSON_OBJECT('medicine_id', 4, 'quantity', 2)),
+          @bill_c11)",
+     'A medicine appears more than once in the bill');
 INSERT INTO test_results (test_id, description, result)
-SELECT 'C11', 'duplicate medicine in the cart refused',
+SELECT 'C11b', 'duplicate medicine in the cart refused',
        IF((SELECT COUNT(*) FROM sale) = @sales_before, 'PASS', 'FAIL');
 
 -- ---------------------------------------------------------------------
@@ -407,7 +467,7 @@ SELECT 'C11', 'duplicate medicine in the cart refused',
 CALL sp_generate_bill(1);
 
 -- C12b unknown bill.  EXPECTED: ERROR 1644 (45000): Bill not found
-CALL sp_generate_bill(999999);
+CALL sp_test_expect_error('C12b', "CALL sp_generate_bill(999999)", 'Bill not found');
 
 -- ---------------------------------------------------------------------
 -- C13 sp_monthly_sales_report - current month. EXPECTED: three result sets
@@ -421,7 +481,10 @@ FROM v_sale_bill
 WHERE YEAR(sale_date) = YEAR(CURDATE()) AND MONTH(sale_date) = MONTH(CURDATE());
 
 -- C13b invalid month.  EXPECTED: ERROR 1644 (45000): Month must be between 1 and 12
-CALL sp_monthly_sales_report(13, 2026);
+CALL sp_test_expect_error('C13b', "CALL sp_monthly_sales_report(13, 2026)", 'Month must be between 1 and 12');
+
+-- C13c a month with NO sales (January 2001): the summary must show zeros (no NULL, no division by 0).
+CALL sp_monthly_sales_report(1, 2001);
 
 -- ---------------------------------------------------------------------
 -- C14 sp_resolve_alert
@@ -435,8 +498,8 @@ INSERT INTO test_results (test_id, description, result)
 SELECT 'C14', 'sp_resolve_alert: alert is RESOLVED and resolved_at is filled',
        IF(status = 'RESOLVED' AND resolved_at IS NOT NULL, 'PASS', 'FAIL')
 FROM stock_alert WHERE alert_id = @alert_id;
-CALL sp_resolve_alert(@alert_id);
-CALL sp_resolve_alert(999999);
+CALL sp_test_expect_error('C14b', "CALL sp_resolve_alert(@alert_id)", 'Alert is already resolved');
+CALL sp_test_expect_error('C14c', "CALL sp_resolve_alert(999999)",    'Alert not found');
 
 
 -- #####################################################################
@@ -564,5 +627,8 @@ WHERE DATE(s.sale_date) > b.expiry_date;
 -- Every check in order.
 SELECT test_id, result, description FROM test_results ORDER BY seq;
 
--- The score.  EXPECTED: FAIL = 0.
+-- The score.  EXPECTED: 63 PASS, FAIL = 0.
 SELECT result, COUNT(*) AS number_of_checks FROM test_results GROUP BY result ORDER BY result;
+
+-- Remove the test helper procedure again (it is not part of the pharmacy database).
+DROP PROCEDURE IF EXISTS sp_test_expect_error;

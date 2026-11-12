@@ -34,7 +34,7 @@ flowchart TD
     S06["06_procedures.sql<br/>9 stored procedures"]
     S07["07_events.sql<br/>daily event + first alerts"]
     T08["08_demo_queries.sql<br/>20 practice queries"]
-    T09["09_test_cases.sql<br/>45 PASS/FAIL checks"]
+    T09["09_test_cases.sql<br/>63 PASS/FAIL checks"]
 
     RUN -.->|SOURCE| S01
     S01 -->|database exists| S02

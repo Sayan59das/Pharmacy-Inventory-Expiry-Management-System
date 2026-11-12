@@ -101,7 +101,7 @@ flowchart TD
 6. **`database/03_sample_data.sql`** - how realistic data is inserted in the right order, dates relative to `CURDATE()`, and why opening stock is calculated with one `UPDATE`.
 7. **`database/04_views.sql`** - views as saved queries: joins, `GROUP BY`, `CASE`, and the "sellable vs expired" definition used everywhere.
 8. **`database/05_triggers.sql`** - BEFORE vs AFTER triggers, `NEW`/`OLD`, `SIGNAL`, and how stock changes automatically.
-9. **`database/06_procedures.sql`** - transactions (`COMMIT`/`ROLLBACK`), exit handlers, cursors and loops, JSON input, and the FEFO selling algorithm.
+9. **`database/06_procedures.sql`** - transactions (`COMMIT`/`ROLLBACK`), exit handlers, simple `WHILE` loops, JSON input, and the FEFO selling algorithm.
 10. **`database/07_events.sql`** - scheduled events, the event scheduler, and why time-based alerts need an event and not a trigger.
 11. **`database/run_all.sql`** - the exact order in which the database is built and how to reset it.
 12. **`database/08_demo_queries.sql`** - 20 queries from `SELECT` to window functions; use it to practise for the viva.

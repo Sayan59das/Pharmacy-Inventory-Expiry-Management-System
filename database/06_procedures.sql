@@ -34,14 +34,15 @@
 --   EXIT HANDLER   : "if any SQL error happens, run this block and then leave the
 --                    procedure". We use it to ROLLBACK, then RESIGNAL (= pass the
 --                    original error on, so the caller sees our clear message).
---   CURSOR         : lets a procedure walk through a query result ROW BY ROW:
---                    DECLARE -> OPEN -> FETCH (in a LOOP) -> CLOSE.
---                    A cursor ends with the NOT FOUND condition ("no more rows"),
---                    caught by a CONTINUE HANDLER that sets v_done = 1.
---   LOOP / LEAVE   : LOOP repeats forever until we LEAVE it.
+--   SIGNAL         : raises our OWN error, e.g. 'Medicine not found'. SQLSTATE '45000'
+--                    means "error defined by the user"; the client sees ERROR 1644.
+--   WHILE loop     : WHILE condition DO ... END WHILE;  repeats the block as long as the
+--                    condition is true. All loops in this file are simple WHILE loops.
 --   JSON_TABLE     : turns a JSON array (sent by the web app) into rows we can read.
+--                    "item_no FOR ORDINALITY" numbers those rows 1, 2, 3 ... so the loop
+--                    can read item number 1, then item number 2, and so on.
 --
--- DECLARE ORDER inside a procedure (MySQL insists on this): variables -> cursors -> handlers.
+-- DECLARE ORDER inside a procedure (MySQL insists on this): first variables, then handlers.
 -- =====================================================================
 
 USE pharmacy_db;
@@ -90,8 +91,9 @@ CREATE PROCEDURE sp_add_purchase(
 )
 BEGIN
     -- ---- variables ----
-    DECLARE v_done        INT DEFAULT 0;      -- becomes 1 when the cursor has no more rows
-    DECLARE v_medicine_id INT;                -- the columns of one item (filled by FETCH)
+    DECLARE v_item_count  INT;                -- how many items the invoice has
+    DECLARE v_i           INT DEFAULT 1;      -- the item we are working on: 1, 2, 3 ...
+    DECLARE v_medicine_id INT;                -- the values of the current item
     DECLARE v_batch_no    VARCHAR(30);
     DECLARE v_mfd         DATE;
     DECLARE v_exp         DATE;
@@ -99,25 +101,9 @@ BEGIN
     DECLARE v_cost        DECIMAL(10,2);
     DECLARE v_sell        DECIMAL(10,2);
     DECLARE v_batch_id    INT;                -- the batch we add stock to
-    DECLARE v_message     VARCHAR(255);       -- text for error messages
+    DECLARE v_message     VARCHAR(255);       -- text for an error message
 
-    -- ---- cursor: walks through the JSON array, one item (row) at a time ----
-    DECLARE cur_items CURSOR FOR
-        SELECT jt.medicine_id, jt.batch_no, jt.manufacture_date, jt.expiry_date,
-               jt.quantity, jt.unit_cost, jt.selling_price
-          FROM JSON_TABLE(p_items, '$[*]' COLUMNS (
-                   medicine_id      INT           PATH '$.medicine_id',
-                   batch_no         VARCHAR(30)   PATH '$.batch_no',
-                   manufacture_date DATE          PATH '$.manufacture_date',
-                   expiry_date      DATE          PATH '$.expiry_date',
-                   quantity         INT           PATH '$.quantity',
-                   unit_cost        DECIMAL(10,2) PATH '$.unit_cost',
-                   selling_price    DECIMAL(10,2) PATH '$.selling_price'
-               )) AS jt;
-
-    -- ---- handlers ----
-    -- When FETCH has no more rows, MySQL raises NOT FOUND; we only set a flag and continue.
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = 1;
+    -- ---- handler ----
     -- On ANY SQL error: undo everything, clear the OUT value, and re-raise the same error.
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -131,6 +117,8 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A purchase needs at least one item (items must be a non-empty JSON array)';
     END IF;
 
+    SET v_item_count = JSON_LENGTH(p_items);   -- JSON_LENGTH = number of elements in the array
+
     -- ---- the transaction starts here ----
     START TRANSACTION;
 
@@ -142,15 +130,23 @@ BEGIN
     -- because later inserts would change it.
     SET p_purchase_id = LAST_INSERT_ID();
 
-    -- Step 2: process every item with the cursor.
-    OPEN cur_items;
-    item_loop: LOOP
-        -- Read the next item into the variables.
-        FETCH cur_items INTO v_medicine_id, v_batch_no, v_mfd, v_exp, v_qty, v_cost, v_sell;
-        -- No more items? Leave the loop.
-        IF v_done = 1 THEN
-            LEAVE item_loop;
-        END IF;
+    -- Step 2: handle the items one by one: item 1, item 2, ... up to v_item_count.
+    WHILE v_i <= v_item_count DO
+
+        -- Read item number v_i out of the JSON array into the variables.
+        SELECT medicine_id, batch_no, manufacture_date, expiry_date, quantity, unit_cost, selling_price
+          INTO v_medicine_id, v_batch_no, v_mfd, v_exp, v_qty, v_cost, v_sell
+          FROM JSON_TABLE(p_items, '$[*]' COLUMNS (
+                   item_no          FOR ORDINALITY,              -- 1 for the first item, 2 for the second ...
+                   medicine_id      INT           PATH '$.medicine_id',
+                   batch_no         VARCHAR(30)   PATH '$.batch_no',
+                   manufacture_date DATE          PATH '$.manufacture_date',
+                   expiry_date      DATE          PATH '$.expiry_date',
+                   quantity         INT           PATH '$.quantity',
+                   unit_cost        DECIMAL(10,2) PATH '$.unit_cost',
+                   selling_price    DECIMAL(10,2) PATH '$.selling_price'
+               )) AS items
+         WHERE item_no = v_i;
 
         -- Every item needs these four values.
         IF v_medicine_id IS NULL OR v_batch_no IS NULL OR v_qty IS NULL OR v_cost IS NULL THEN
@@ -159,22 +155,19 @@ BEGIN
         END IF;
 
         -- Does this exact lot (medicine + supplier + batch number) already exist?
-        -- MAX() returns NULL when nothing matches and never raises NOT FOUND,
-        -- so it cannot disturb the cursor's NOT FOUND handler.
-        SELECT MAX(batch_id)
-          INTO v_batch_id
-          FROM batch
-         WHERE medicine_id = v_medicine_id
-           AND supplier_id = p_supplier_id
-           AND batch_no    = v_batch_no;
+        -- The sub-query gives its batch_id, or NULL when there is no such batch.
+        SET v_batch_id = (SELECT batch_id
+                            FROM batch
+                           WHERE medicine_id = v_medicine_id
+                             AND supplier_id = p_supplier_id
+                             AND batch_no    = v_batch_no);
 
         -- Not found -> create a new batch with quantity 0 (the trigger will add the stock).
         IF v_batch_id IS NULL THEN
             IF v_mfd IS NULL OR v_exp IS NULL OR v_sell IS NULL THEN
-                -- MESSAGE_TEXT accepts only a literal or a variable (max 128 characters),
-                -- so the text is built and cut in a variable first.
-                SET v_message = LEFT(CONCAT('New batch ', v_batch_no,
-                                            ' needs manufacture_date, expiry_date and selling_price'), 128);
+                -- MESSAGE_TEXT accepts only a fixed text or a variable, so we build the text first.
+                SET v_message = CONCAT('New batch ', v_batch_no,
+                                       ' needs manufacture_date, expiry_date and selling_price');
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_message;
             END IF;
 
@@ -190,8 +183,9 @@ BEGIN
         -- trigger trg_purchase_item_after_insert adds v_qty to the batch stock.
         INSERT INTO purchase_item (purchase_id, batch_id, quantity, unit_cost)
         VALUES (p_purchase_id, v_batch_id, v_qty, v_cost);
-    END LOOP item_loop;
-    CLOSE cur_items;
+
+        SET v_i = v_i + 1;                     -- go on with the next item
+    END WHILE;
 
     -- Step 3: everything worked - make the changes permanent.
     COMMIT;
@@ -208,8 +202,8 @@ END$$
 --     the next batches (one sale_item line per batch).
 --
 -- Example: Paracetamol, customer wants 40.
---   batch PCM-24B (expires first) has 31  -> line 1: 31 units
---   batch PCM-25A (expires later) has 150 -> line 2: 9 units
+--   round 1: batch PCM-24B (expires first) has 31  -> line 1: 31 units, 9 still needed
+--   round 2: batch PCM-25A (expires next)  has 150 -> line 2:  9 units, 0 still needed -> stop
 --
 -- It does NOT start or commit a transaction itself. The caller
 -- (sp_make_sale or sp_make_bill) owns the transaction, so that several
@@ -222,31 +216,15 @@ CREATE PROCEDURE sp_add_medicine_to_sale(
 )
 BEGIN
     -- ---- variables ----
-    DECLARE v_done        INT DEFAULT 0;          -- cursor finished flag
-    DECLARE v_remaining   INT;                    -- units still to be found
+    DECLARE v_name        VARCHAR(100);           -- medicine name (used in messages)
+    DECLARE v_gst         DECIMAL(5,2);           -- GST rate, copied into every bill line
     DECLARE v_available   INT;                    -- total sellable units of the medicine
-    DECLARE v_batch_id    INT;                    -- columns of the batch just fetched
-    DECLARE v_batch_stock INT;
-    DECLARE v_price       DECIMAL(10,2);
-    DECLARE v_take        INT;                    -- units taken from this batch
-    DECLARE v_name        VARCHAR(100);           -- medicine name and GST rate
-    DECLARE v_gst         DECIMAL(5,2);
+    DECLARE v_remaining   INT;                    -- units we still have to find
+    DECLARE v_batch_id    INT;                    -- the batch chosen in this round of the loop
+    DECLARE v_batch_stock INT;                    -- how many units that batch holds
+    DECLARE v_price       DECIMAL(10,2);          -- its selling price
+    DECLARE v_take        INT;                    -- units we take from that batch
     DECLARE v_message     VARCHAR(255);
-
-    -- ---- cursor: sellable batches of this medicine, earliest expiry first ----
-    -- FOR UPDATE locks these rows until the transaction ends, so a second
-    -- cashier cannot sell the same units at the same time.
-    DECLARE cur_batches CURSOR FOR
-        SELECT batch_id, quantity_in_stock, selling_price
-          FROM batch
-         WHERE medicine_id       = p_medicine_id
-           AND quantity_in_stock > 0
-           AND expiry_date      >= CURDATE()
-         ORDER BY expiry_date ASC, batch_id ASC
-           FOR UPDATE;
-
-    -- ---- handler: end of cursor ----
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = 1;
 
     -- ---- validation ----
     IF p_quantity IS NULL OR p_quantity <= 0 THEN
@@ -269,48 +247,51 @@ BEGIN
        AND expiry_date >= CURDATE();
 
     IF v_available < p_quantity THEN
+        -- MESSAGE_TEXT can hold at most 128 characters, so LEFT(..., 128) cuts a long text.
         SET v_message = LEFT(CONCAT('Insufficient stock for ', v_name,
                                     ': requested ', p_quantity, ', sellable ', v_available), 128);
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_message;
     END IF;
 
     -- ---- the FEFO loop ----
-    SET v_remaining = p_quantity;     -- at the start we still need all units
-    SET v_done = 0;                   -- reset the cursor flag
+    -- Every round: pick the sellable batch that expires FIRST, take as many units as it can
+    -- give, and write one bill line. The AFTER INSERT trigger on sale_item lowers that batch's
+    -- stock, so a batch we emptied is not picked again in the next round.
+    SET v_remaining = p_quantity;                 -- at the start we still need all units
 
-    OPEN cur_batches;
-    fefo_loop: LOOP
-        FETCH cur_batches INTO v_batch_id, v_batch_stock, v_price;
-        IF v_done = 1 THEN
-            LEAVE fefo_loop;          -- no more batches
+    WHILE v_remaining > 0 DO
+
+        -- The batch that expires first. LIMIT 1 = only the first row of the sorted list.
+        -- FOR UPDATE locks that row until the transaction ends, so a second cashier
+        -- cannot sell the same units at the same time.
+        SET v_batch_id = NULL;
+        SELECT batch_id, quantity_in_stock, selling_price
+          INTO v_batch_id, v_batch_stock, v_price
+          FROM batch
+         WHERE medicine_id       = p_medicine_id
+           AND quantity_in_stock > 0
+           AND expiry_date      >= CURDATE()
+         ORDER BY expiry_date ASC, batch_id ASC
+         LIMIT 1
+           FOR UPDATE;
+
+        -- Safety net: cannot normally happen, because we checked the total stock above.
+        IF v_batch_id IS NULL THEN
+            SET v_message = LEFT(CONCAT('Could not allocate all units of ', v_name), 128);
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_message;
         END IF;
 
-        -- Take whatever this batch can give, but never more than we still need.
-        IF v_batch_stock < v_remaining THEN
-            SET v_take = v_batch_stock;
-        ELSE
-            SET v_take = v_remaining;
-        END IF;
+        -- Take what this batch can give, but never more than we still need.
+        -- LEAST() returns the smaller of the two numbers.
+        SET v_take = LEAST(v_batch_stock, v_remaining);
 
         -- One bill line per batch. unit_price and gst_percent are the SNAPSHOT of today's values.
         -- The BEFORE trigger re-checks stock and expiry; the AFTER trigger reduces the batch stock.
         INSERT INTO sale_item (sale_id, batch_id, quantity, unit_price, gst_percent)
         VALUES (p_sale_id, v_batch_id, v_take, v_price, v_gst);
 
-        SET v_remaining = v_remaining - v_take;
-
-        -- Found everything? Stop early.
-        IF v_remaining = 0 THEN
-            LEAVE fefo_loop;
-        END IF;
-    END LOOP fefo_loop;
-    CLOSE cur_batches;
-
-    -- Safety net: should never happen because of the stock check above.
-    IF v_remaining > 0 THEN
-        SET v_message = LEFT(CONCAT('Could not allocate all units of ', v_name), 128);
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_message;
-    END IF;
+        SET v_remaining = v_remaining - v_take;   -- the loop stops when this reaches 0
+    END WHILE;
 END$$
 
 
@@ -382,21 +363,13 @@ CREATE PROCEDURE sp_make_bill(
 )
 BEGIN
     -- ---- variables ----
-    DECLARE v_done        INT DEFAULT 0;
-    DECLARE v_medicine_id INT;
+    DECLARE v_item_count  INT;                -- how many medicines are in the cart
+    DECLARE v_i           INT DEFAULT 1;      -- the cart line we are working on: 1, 2, 3 ...
+    DECLARE v_medicine_id INT;                -- the values of that cart line
     DECLARE v_quantity    INT;
-    DECLARE v_duplicates  INT DEFAULT 0;
+    DECLARE v_duplicates  INT DEFAULT 0;      -- how many medicines are listed twice
 
-    -- ---- cursor over the cart items ----
-    DECLARE cur_cart CURSOR FOR
-        SELECT jt.medicine_id, jt.quantity
-          FROM JSON_TABLE(p_items, '$[*]' COLUMNS (
-                   medicine_id INT PATH '$.medicine_id',
-                   quantity    INT PATH '$.quantity'
-               )) AS jt;
-
-    -- ---- handlers ----
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = 1;
+    -- ---- handler: on any error undo the WHOLE bill and pass the error on ----
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
@@ -419,15 +392,17 @@ BEGIN
     END IF;
 
     -- A medicine listed twice would try to use the same batch twice on one bill.
-    -- (number of rows) - (number of different medicines) = number of repeats.
-    SELECT COUNT(*) - COUNT(DISTINCT jt.medicine_id)
+    -- (number of lines) - (number of different medicines) = number of repeats.
+    SELECT COUNT(*) - COUNT(DISTINCT medicine_id)
       INTO v_duplicates
-      FROM JSON_TABLE(p_items, '$[*]' COLUMNS (medicine_id INT PATH '$.medicine_id')) AS jt;
+      FROM JSON_TABLE(p_items, '$[*]' COLUMNS (medicine_id INT PATH '$.medicine_id')) AS cart;
 
     IF v_duplicates > 0 THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'A medicine appears more than once in the bill - add the quantities together';
     END IF;
+
+    SET v_item_count = JSON_LENGTH(p_items);
 
     -- ---- the transaction ----
     START TRANSACTION;
@@ -437,18 +412,25 @@ BEGIN
 
     SET p_sale_id = LAST_INSERT_ID();
 
-    OPEN cur_cart;
-    cart_loop: LOOP
-        FETCH cur_cart INTO v_medicine_id, v_quantity;
-        IF v_done = 1 THEN
-            LEAVE cart_loop;
-        END IF;
+    -- Sell the cart lines one by one: line 1, line 2, ... up to v_item_count.
+    WHILE v_i <= v_item_count DO
+
+        -- Read cart line number v_i (same JSON_TABLE idea as in sp_add_purchase).
+        SELECT medicine_id, quantity
+          INTO v_medicine_id, v_quantity
+          FROM JSON_TABLE(p_items, '$[*]' COLUMNS (
+                   item_no     FOR ORDINALITY,
+                   medicine_id INT PATH '$.medicine_id',
+                   quantity    INT PATH '$.quantity'
+               )) AS cart
+         WHERE item_no = v_i;
 
         -- FEFO for this medicine. If it fails, the error reaches our EXIT HANDLER:
         -- the WHOLE bill (all earlier medicines too) is rolled back.
         CALL sp_add_medicine_to_sale(p_sale_id, v_medicine_id, v_quantity);
-    END LOOP cart_loop;
-    CLOSE cur_cart;
+
+        SET v_i = v_i + 1;                     -- go on with the next cart line
+    END WHILE;
 
     COMMIT;
 END$$
@@ -511,8 +493,13 @@ CREATE PROCEDURE sp_monthly_sales_report(
     IN p_year  INT
 )
 BEGIN
-    DECLARE v_start DATE;     -- first day of the month
-    DECLARE v_end   DATE;     -- first day of the NEXT month
+    DECLARE v_start   DATE;               -- first day of the month,      e.g. 2026-11-01
+    DECLARE v_end     DATE;               -- first day of the NEXT month, e.g. 2026-12-01
+    DECLARE v_bills   INT;                -- number of bills in the month
+    DECLARE v_units   INT;                -- units sold
+    DECLARE v_sales   DECIMAL(12,2);      -- money taken (GST included)
+    DECLARE v_gst     DECIMAL(12,2);      -- the GST inside that money
+    DECLARE v_average DECIMAL(12,2);      -- average value of one bill
 
     -- Validate the inputs.
     IF p_month IS NULL OR p_month < 1 OR p_month > 12 THEN
@@ -522,23 +509,35 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Year must be between 2000 and 2100';
     END IF;
 
-    -- Build the first day of the month, e.g. year 2026, month 11 -> '2026-11-01'.
-    -- LPAD(month, 2, '0') turns 5 into '05'.
-    SET v_start = CAST(CONCAT(p_year, '-', LPAD(p_month, 2, '0'), '-01') AS DATE);
+    -- STR_TO_DATE turns the text '2026-11-01' into a real DATE.
+    SET v_start = STR_TO_DATE(CONCAT(p_year, '-', p_month, '-01'), '%Y-%m-%d');
     SET v_end   = DATE_ADD(v_start, INTERVAL 1 MONTH);
 
-    -- Result set 1: the summary. We use  >= start AND < end  so that every moment of the
-    -- last day (23:59:59) is included, and an index on sale_date can be used.
-    SELECT p_month                                   AS report_month,
-           p_year                                    AS report_year,
-           COUNT(DISTINCT sale_id)                   AS total_bills,
-           COALESCE(SUM(quantity), 0)                AS total_units,
-           COALESCE(SUM(line_total), 0)              AS total_sales,
-           COALESCE(SUM(gst_amount), 0)              AS total_gst_collected,
-           COALESCE(ROUND(SUM(line_total) / NULLIF(COUNT(DISTINCT sale_id), 0), 2), 0) AS average_bill_value
+    -- Every query below keeps the sales with  v_start <= sale_date < v_end.
+    -- This includes every moment of the last day (23:59:59), and the index on sale_date can be used.
+
+    -- Step 1: add up the month.
+    SELECT COUNT(DISTINCT sale_id), SUM(quantity), SUM(line_total), SUM(gst_amount)
+      INTO v_bills, v_units, v_sales, v_gst
       FROM v_sale_bill
      WHERE sale_date >= v_start
        AND sale_date <  v_end;
+
+    -- A month without any sale gives NULL sums: show 0 instead, and never divide by 0.
+    IF v_bills = 0 THEN
+        SET v_units = 0, v_sales = 0, v_gst = 0, v_average = 0;
+    ELSE
+        SET v_average = ROUND(v_sales / v_bills, 2);
+    END IF;
+
+    -- Result set 1: the summary (one row).
+    SELECT p_month   AS report_month,
+           p_year    AS report_year,
+           v_bills   AS total_bills,
+           v_units   AS total_units,
+           v_sales   AS total_sales,
+           v_gst     AS total_gst_collected,
+           v_average AS average_bill_value;
 
     -- Result set 2: sales by payment mode.
     SELECT payment_mode,
@@ -576,9 +575,7 @@ BEGIN
     DECLARE v_status VARCHAR(10);      -- current status of the alert
 
     -- Look up the alert. If it does not exist, v_status stays NULL.
-    SELECT status INTO v_status
-      FROM stock_alert
-     WHERE alert_id = p_alert_id;
+    SET v_status = (SELECT status FROM stock_alert WHERE alert_id = p_alert_id);
 
     IF v_status IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Alert not found';
@@ -614,7 +611,7 @@ CREATE PROCEDURE sp_generate_expiry_alerts()
 BEGIN
     DECLARE v_near_added    INT DEFAULT 0;     -- how many NEAR_EXPIRY alerts we created
     DECLARE v_expired_added INT DEFAULT 0;     -- how many EXPIRED alerts we created
-    DECLARE v_superseded    INT DEFAULT 0;     -- how many old NEAR_EXPIRY alerts we closed
+    DECLARE v_closed        INT DEFAULT 0;     -- how many old NEAR_EXPIRY alerts we closed
 
     -- 1) NEAR_EXPIRY alerts.
     --    INSERT ... SELECT inserts one alert for every batch the SELECT returns.
@@ -622,9 +619,9 @@ BEGIN
     INSERT INTO stock_alert (alert_type, batch_id, message)
     SELECT 'NEAR_EXPIRY',
            b.batch_id,
-           LEFT(CONCAT(m.medicine_name, ' batch ', b.batch_no, ' expires on ', b.expiry_date,
-                       ' (', DATEDIFF(b.expiry_date, CURDATE()), ' days left, ',
-                       b.quantity_in_stock, ' units in stock)'), 255)
+           CONCAT(m.medicine_name, ' batch ', b.batch_no, ' expires on ', b.expiry_date,
+                  ' (', DATEDIFF(b.expiry_date, CURDATE()), ' days left, ',
+                  b.quantity_in_stock, ' units in stock)')
       FROM batch    AS b
       JOIN medicine AS m ON m.medicine_id = b.medicine_id
      WHERE b.quantity_in_stock > 0
@@ -640,9 +637,9 @@ BEGIN
     INSERT INTO stock_alert (alert_type, batch_id, message)
     SELECT 'EXPIRED',
            b.batch_id,
-           LEFT(CONCAT(m.medicine_name, ' batch ', b.batch_no, ' expired on ', b.expiry_date,
-                       ' (', DATEDIFF(CURDATE(), b.expiry_date), ' days ago, ',
-                       b.quantity_in_stock, ' units still in stock)'), 255)
+           CONCAT(m.medicine_name, ' batch ', b.batch_no, ' expired on ', b.expiry_date,
+                  ' (', DATEDIFF(CURDATE(), b.expiry_date), ' days ago, ',
+                  b.quantity_in_stock, ' units still in stock)')
       FROM batch    AS b
       JOIN medicine AS m ON m.medicine_id = b.medicine_id
      WHERE b.quantity_in_stock > 0
@@ -664,12 +661,12 @@ BEGIN
        AND alert_type = 'NEAR_EXPIRY'
        AND status     = 'OPEN'
        AND batch_id IN (SELECT batch_id FROM batch WHERE expiry_date < CURDATE());
-    SET v_superseded = ROW_COUNT();
+    SET v_closed = ROW_COUNT();
 
     -- Report what happened.
     SELECT v_near_added    AS near_expiry_alerts_added,
            v_expired_added AS expired_alerts_added,
-           v_superseded    AS near_expiry_alerts_closed;
+           v_closed        AS near_expiry_alerts_closed;
 END$$
 
 
@@ -684,13 +681,13 @@ END$$
 -- =====================================================================
 CREATE PROCEDURE sp_generate_low_stock_alerts()
 BEGIN
-    DECLARE v_added INT DEFAULT 0;
+    DECLARE v_added INT DEFAULT 0;             -- how many LOW_STOCK alerts we created
 
     INSERT INTO stock_alert (alert_type, medicine_id, message)
     SELECT 'LOW_STOCK',
            l.medicine_id,
-           LEFT(CONCAT('Sellable stock of ', l.medicine_name, ' is ', l.sellable_quantity,
-                       ', below reorder level ', l.reorder_level), 255)
+           CONCAT('Sellable stock of ', l.medicine_name, ' is ', l.sellable_quantity,
+                  ', below reorder level ', l.reorder_level)
       FROM v_low_stock AS l
      WHERE NOT EXISTS (SELECT 1
                          FROM stock_alert AS a

@@ -80,7 +80,7 @@ pharmacy-inventory-system/
 │   ├── 06_procedures.sql           9 stored procedures (the business logic)
 │   ├── 07_events.sql               daily alert event
 │   ├── 08_demo_queries.sql         20 practice queries (SELECT ... window functions)
-│   ├── 09_test_cases.sql           45 automatic PASS/FAIL checks
+│   ├── 09_test_cases.sql           63 automatic PASS/FAIL checks
 │   └── run_all.sql                 builds everything: runs 01 to 07
 ├── backend/                     Python FastAPI app (no business logic, only calls MySQL)
 │   ├── requirements.txt
@@ -188,10 +188,12 @@ Things to try:
 ```bash
 cd pharmacy-inventory-system/database
 mysql -u root -p < run_all.sql                 # clean start
-mysql -u root -p --force < 09_test_cases.sql   # --force: continue after the expected errors
+mysql -u root -p < 09_test_cases.sql            # or open it in Workbench and run it all
 ```
-The last lines show the score: **45 PASS, 0 FAIL**. The lines starting with `ERROR 1644` are the *expected*
-failure cases (selling expired stock and so on). Run `run_all.sql` again afterwards to get a clean database.
+The last lines show the score: **63 PASS, 0 FAIL**. 18 of these checks are *negative tests*: they try something
+that must be refused (selling expired stock, a wrong supplier, month 13 ...). The test file catches MySQL's error
+and shows it as a PASS row with the message, so the run has no red errors. Run `run_all.sql` again afterwards
+to get a clean database.
 
 ## 7. The important design decisions (short)
 
