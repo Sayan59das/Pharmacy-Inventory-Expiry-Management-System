@@ -253,9 +253,31 @@ then customer ↔ customer_medical_profile would be 1:1.
 
 ---
 
-## 6. ER diagram (Mermaid)
+## 6. ER diagram
 
-Paste this block into any Mermaid viewer (GitHub, VS Code "Markdown Preview Mermaid Support",
+### 6a. Chen notation (the classic textbook ER diagram)
+
+Files: [`er_diagram.png`](er_diagram.png) (for slides / printing) and [`er_diagram.svg`](er_diagram.svg) (zoom without blur).
+
+![ER diagram of pharmacy_db in Chen notation](er_diagram.png)
+
+How to read it:
+* **Rectangle** = entity (one table). **Oval** = attribute (one column). **Green underlined oval** = primary key.
+* **Diamond** = relationship. Every relationship here is **1 : N** (the `1` and `N` are written on the lines).
+* **Double line** = total participation: every row on that side MUST have the link (its foreign key is `NOT NULL`),
+  e.g. every BATCH must belong to a MEDICINE. **Single line** = partial (optional), e.g. a SALE may have no
+  CUSTOMER (walk-in), and an alert points to a medicine OR a batch.
+* **Purple oval marked (FK)** = foreign key column. Every column of every table is in the picture
+  (47 attributes + 11 foreign keys). Each 1 : N relationship is stored as the FK column in the table on
+  the **N** side: Has -> `batch.medicine_id`, Supplies -> `batch.supplier_id`, Classifies -> `medicine.category_id`,
+  Issues -> `purchase.supplier_id`, Contains -> `purchase_item.purchase_id` / `sale_item.sale_id`,
+  Received in -> `purchase_item.batch_id`, Sold in -> `sale_item.batch_id`, Places -> `sale.customer_id`,
+  Raises -> `stock_alert.medicine_id`, Triggers -> `stock_alert.batch_id`.
+
+### 6b. Crow's-foot notation (the same design drawn as tables with keys)
+
+Files: [`schema_diagram.png`](schema_diagram.png) and [`schema_diagram.svg`](schema_diagram.svg).
+To edit it, paste this block into any Mermaid viewer (GitHub, VS Code "Markdown Preview Mermaid Support",
 or https://mermaid.live) to see the picture.
 Crow's-foot symbols: `||` exactly one · `o|` zero or one · `o{` zero or many · `|{` one or many.
 

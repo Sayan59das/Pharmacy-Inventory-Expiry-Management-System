@@ -1,0 +1,315 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2760" height="2010" viewBox="0 0 2760 2010" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="40" y="62" font-size="32" font-weight="700" fill="#1f2937">ER Diagram - Pharmacy Inventory &amp; Expiry Management</text>
+<text x="40" y="98" font-size="18" fill="#475569">Chen notation  ·  database pharmacy_db  ·  10 entities  ·  11 relationships (all 1 : N)</text>
+<g id="lines">
+<line x1="300.0" y1="1030.0" x2="650.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="650.0" y1="1034.0" x2="1000.0" y2="1034.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="650.0" y1="1026.0" x2="1000.0" y2="1026.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="1350.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1350.0" y1="1034.0" x2="1700.0" y2="1034.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1350.0" y1="1026.0" x2="1700.0" y2="1026.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1700.0" y2="705.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1696.0" y1="705.0" x2="1696.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1704.0" y1="705.0" x2="1704.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="2050.0" y2="380.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2050.0" y1="384.0" x2="2400.0" y2="384.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2050.0" y1="376.0" x2="2400.0" y2="376.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="380.0" x2="2400.0" y2="705.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2396.0" y1="705.0" x2="2396.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2404.0" y1="705.0" x2="2404.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="2050.0" y2="1030.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2050.0" y1="1034.0" x2="2400.0" y2="1034.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2050.0" y1="1026.0" x2="2400.0" y2="1026.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1680.0" x2="650.0" y2="1680.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="650.0" y1="1680.0" x2="1000.0" y2="1680.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1680.0" x2="1350.0" y2="1680.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1350.0" y1="1684.0" x2="1700.0" y2="1684.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1350.0" y1="1676.0" x2="1700.0" y2="1676.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1700.0" y2="1355.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1696.0" y1="1355.0" x2="1696.0" y2="1680.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1704.0" y1="1355.0" x2="1704.0" y2="1680.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="1000.0" y2="705.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="705.0" x2="1000.0" y2="380.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1350.0" y2="705.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1350.0" y1="705.0" x2="1000.0" y2="380.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="720.0" y2="380.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="773.0" y2="274.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="913.0" y2="209.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="1087.0" y2="209.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="1227.0" y2="274.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="1280.0" y2="380.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="800.0" y2="490.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="380.0" x2="1110.0" y2="560.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1630.0" y2="186.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1790.0" y2="190.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1922.0" y2="251.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1491.0" y2="241.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1416.0" y2="338.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1427.0" y2="448.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="380.0" x2="1514.0" y2="533.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="380.0" x2="2265.0" y2="225.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="380.0" x2="2510.0" y2="210.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="380.0" x2="2600.0" y2="480.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="380.0" x2="2620.0" y2="360.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="1030.0" x2="2615.0" y2="960.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="1030.0" x2="2640.0" y2="1060.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="1030.0" x2="2500.0" y2="1170.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="1030.0" x2="2600.0" y2="805.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2400.0" y1="1030.0" x2="2300.0" y2="1160.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1030.0" x2="150.0" y2="900.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1030.0" x2="430.0" y2="890.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1030.0" x2="220.0" y2="1170.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="800.0" y2="880.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="1200.0" y2="880.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="750.0" y2="1160.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="850.0" y2="1260.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="1010.0" y2="1330.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="1160.0" y2="1260.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="1250.0" y2="1160.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1030.0" x2="870.0" y2="790.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1540.0" y2="1170.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1430.0" y2="1110.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1900.0" y2="860.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1985.0" y2="940.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1990.0" y2="1110.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1880.0" y2="1190.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1830.0" y2="1290.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1490.0" y2="945.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1030.0" x2="1790.0" y2="785.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1680.0" x2="150.0" y2="1540.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1680.0" x2="420.0" y2="1530.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1680.0" x2="170.0" y2="1830.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="300.0" y1="1680.0" x2="420.0" y2="1840.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1680.0" x2="830.0" y2="1820.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1680.0" x2="1000.0" y2="1860.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1680.0" x2="1180.0" y2="1820.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1000.0" y1="1680.0" x2="840.0" y2="1560.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1680.0" x2="1920.0" y2="1590.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1680.0" x2="1960.0" y2="1760.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1680.0" x2="1790.0" y2="1850.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1680.0" x2="1580.0" y2="1830.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1680.0" x2="1530.0" y2="1560.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="1700.0" y1="1680.0" x2="1850.0" y2="1490.0" stroke="#334155" stroke-width="1.8"/>
+</g>
+<ellipse cx="720.0" cy="380.0" rx="48.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="720.0" y="380.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">alert_id</text>
+<line x1="685.6" y1="390.0" x2="754.4" y2="390.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="773.0" cy="274.0" rx="56.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="773.0" y="274.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">alert_type</text>
+<ellipse cx="913.0" cy="209.0" rx="44.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="913.0" y="209.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">message</text>
+<ellipse cx="1087.0" cy="209.0" rx="40.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1087.0" y="209.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">status</text>
+<ellipse cx="1227.0" cy="274.0" rx="56.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1227.0" y="274.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">created_at</text>
+<ellipse cx="1280.0" cy="380.0" rx="60.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1280.0" y="380.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">resolved_at</text>
+<ellipse cx="800.0" cy="490.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="800.0" y="490.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">medicine_id (FK)</text>
+<ellipse cx="1110.0" cy="560.0" rx="68.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="1110.0" y="560.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">batch_id (FK)</text>
+<ellipse cx="1630.0" cy="186.0" rx="60.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="1630.0" y="186.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">supplier_id</text>
+<line x1="1582.7" y1="196.0" x2="1677.3" y2="196.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="1790.0" cy="190.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1790.0" y="190.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">supplier_name</text>
+<ellipse cx="1922.0" cy="251.0" rx="72.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1922.0" y="251.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">contact_person</text>
+<ellipse cx="1491.0" cy="241.0" rx="40.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1491.0" y="241.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">phone</text>
+<ellipse cx="1416.0" cy="338.0" rx="40.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1416.0" y="338.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">email</text>
+<ellipse cx="1427.0" cy="448.0" rx="44.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1427.0" y="448.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">address</text>
+<ellipse cx="1514.0" cy="533.0" rx="40.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1514.0" y="533.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">gst_no</text>
+<ellipse cx="2265.0" cy="225.0" rx="60.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="2265.0" y="225.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">purchase_id</text>
+<line x1="2217.7" y1="235.0" x2="2312.3" y2="235.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="2510.0" cy="210.0" rx="56.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="2510.0" y="210.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">invoice_no</text>
+<ellipse cx="2600.0" cy="480.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="2600.0" y="480.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">purchase_date</text>
+<ellipse cx="2620.0" cy="360.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="2620.0" y="360.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">supplier_id (FK)</text>
+<ellipse cx="2615.0" cy="960.0" rx="80.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="2615.0" y="960.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">purchase_item_id</text>
+<line x1="2546.2" y1="970.0" x2="2683.8" y2="970.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="2640.0" cy="1060.0" rx="48.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="2640.0" y="1060.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">quantity</text>
+<ellipse cx="2500.0" cy="1170.0" rx="52.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="2500.0" y="1170.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">unit_cost</text>
+<ellipse cx="2600.0" cy="805.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="2600.0" y="805.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">purchase_id (FK)</text>
+<ellipse cx="2300.0" cy="1160.0" rx="68.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="2300.0" y="1160.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">batch_id (FK)</text>
+<ellipse cx="150.0" cy="900.0" rx="60.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="150.0" y="900.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">category_id</text>
+<line x1="102.7" y1="910.0" x2="197.3" y2="910.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="430.0" cy="890.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="430.0" y="890.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">category_name</text>
+<ellipse cx="220.0" cy="1170.0" rx="60.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="220.0" y="1170.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">description</text>
+<ellipse cx="800.0" cy="880.0" rx="60.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="800.0" y="880.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">medicine_id</text>
+<line x1="752.7" y1="890.0" x2="847.3" y2="890.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="1200.0" cy="880.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1200.0" y="880.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">medicine_name</text>
+<ellipse cx="750.0" cy="1160.0" rx="64.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="750.0" y="1160.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">generic_name</text>
+<ellipse cx="850.0" cy="1260.0" rx="64.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="850.0" y="1260.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">manufacturer</text>
+<ellipse cx="1010.0" cy="1330.0" rx="100.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1010.0" y="1330.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">requires_prescription</text>
+<ellipse cx="1160.0" cy="1260.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1160.0" y="1260.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">reorder_level</text>
+<ellipse cx="1250.0" cy="1160.0" rx="60.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1250.0" y="1160.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">gst_percent</text>
+<ellipse cx="870.0" cy="790.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="870.0" y="790.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">category_id (FK)</text>
+<ellipse cx="1540.0" cy="1170.0" rx="48.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="1540.0" y="1170.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">batch_id</text>
+<line x1="1505.6" y1="1180.0" x2="1574.4" y2="1180.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="1430.0" cy="1110.0" rx="48.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1430.0" y="1110.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">batch_no</text>
+<ellipse cx="1900.0" cy="860.0" rx="80.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1900.0" y="860.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">manufacture_date</text>
+<ellipse cx="1985.0" cy="940.0" rx="60.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1985.0" y="940.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">expiry_date</text>
+<ellipse cx="1990.0" cy="1110.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1990.0" y="1110.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">selling_price</text>
+<ellipse cx="1880.0" cy="1190.0" rx="56.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1880.0" y="1190.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">cost_price</text>
+<ellipse cx="1830.0" cy="1290.0" rx="84.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1830.0" y="1290.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">quantity_in_stock</text>
+<ellipse cx="1490.0" cy="945.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="1490.0" y="945.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">medicine_id (FK)</text>
+<ellipse cx="1790.0" cy="785.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="1790.0" y="785.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">supplier_id (FK)</text>
+<ellipse cx="150.0" cy="1540.0" rx="60.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="150.0" y="1540.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">customer_id</text>
+<line x1="102.7" y1="1550.0" x2="197.3" y2="1550.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="420.0" cy="1530.0" rx="68.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="420.0" y="1530.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">customer_name</text>
+<ellipse cx="170.0" cy="1830.0" rx="40.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="170.0" y="1830.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">phone</text>
+<ellipse cx="420.0" cy="1840.0" rx="44.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="420.0" y="1840.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">address</text>
+<ellipse cx="830.0" cy="1820.0" rx="44.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="830.0" y="1820.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">sale_id</text>
+<line x1="799.9" y1="1830.0" x2="860.1" y2="1830.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="1000.0" cy="1860.0" rx="52.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1000.0" y="1860.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">sale_date</text>
+<ellipse cx="1180.0" cy="1820.0" rx="64.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1180.0" y="1820.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">payment_mode</text>
+<ellipse cx="840.0" cy="1560.0" rx="80.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="840.0" y="1560.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">customer_id (FK)</text>
+<ellipse cx="1920.0" cy="1590.0" rx="64.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="1920.0" y="1590.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">sale_item_id</text>
+<line x1="1868.4" y1="1600.0" x2="1971.6" y2="1600.0" stroke="#1f2937" stroke-width="1.5"/>
+<ellipse cx="1960.0" cy="1760.0" rx="48.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1960.0" y="1760.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">quantity</text>
+<ellipse cx="1790.0" cy="1850.0" rx="56.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1790.0" y="1850.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">unit_price</text>
+<ellipse cx="1580.0" cy="1830.0" rx="60.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1580.0" y="1830.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">gst_percent</text>
+<ellipse cx="1530.0" cy="1560.0" rx="64.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="1530.0" y="1560.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">sale_id (FK)</text>
+<ellipse cx="1850.0" cy="1490.0" rx="68.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="1850.0" y="1490.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">batch_id (FK)</text>
+<polygon points="650.0,987.0 730.0,1030.0 650.0,1073.0 570.0,1030.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="650.0" y="1030.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Classifies</text>
+<polygon points="1350.0,987.0 1430.0,1030.0 1350.0,1073.0 1270.0,1030.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1350.0" y="1030.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Has</text>
+<polygon points="1700.0,662.0 1780.0,705.0 1700.0,748.0 1620.0,705.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1700.0" y="705.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Supplies</text>
+<polygon points="2050.0,337.0 2130.0,380.0 2050.0,423.0 1970.0,380.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="2050.0" y="380.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Issues</text>
+<polygon points="2400.0,662.0 2480.0,705.0 2400.0,748.0 2320.0,705.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="2400.0" y="705.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Contains</text>
+<polygon points="2050.0,987.0 2130.0,1030.0 2050.0,1073.0 1970.0,1030.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="2050.0" y="1030.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Received in</text>
+<polygon points="650.0,1637.0 730.0,1680.0 650.0,1723.0 570.0,1680.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="650.0" y="1680.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Places</text>
+<polygon points="1350.0,1637.0 1430.0,1680.0 1350.0,1723.0 1270.0,1680.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1350.0" y="1680.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Contains</text>
+<polygon points="1700.0,1312.0 1780.0,1355.0 1700.0,1398.0 1620.0,1355.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1700.0" y="1355.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Sold in</text>
+<polygon points="1000.0,662.0 1080.0,705.0 1000.0,748.0 920.0,705.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1000.0" y="705.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Raises</text>
+<polygon points="1350.0,662.0 1430.0,705.0 1350.0,748.0 1270.0,705.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1350.0" y="705.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Triggers</text>
+<rect x="895.0" y="350.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="1000.0" y="380.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">STOCK_ALERT</text>
+<rect x="1595.0" y="350.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="1700.0" y="380.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">SUPPLIER</text>
+<rect x="2295.0" y="350.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="2400.0" y="380.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">PURCHASE</text>
+<rect x="195.0" y="1000.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="300.0" y="1030.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">CATEGORY</text>
+<rect x="895.0" y="1000.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="1000.0" y="1030.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">MEDICINE</text>
+<rect x="1595.0" y="1000.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="1700.0" y="1030.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">BATCH</text>
+<rect x="2295.0" y="1000.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="2400.0" y="1030.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">PURCHASE_ITEM</text>
+<rect x="195.0" y="1650.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="300.0" y="1680.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">CUSTOMER</text>
+<rect x="895.0" y="1650.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="1000.0" y="1680.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">SALE</text>
+<rect x="1595.0" y="1650.0" width="210" height="60" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="1700.0" y="1680.0" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">SALE_ITEM</text>
+<text x="487.5" y="1013.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="812.5" y="1013.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1187.5" y="1013.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="1512.5" y="1013.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1717.0" y="536.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="1717.0" y="874.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1887.5" y="363.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="2212.5" y="363.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="2417.0" y="536.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="2417.0" y="874.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1887.5" y="1013.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="2212.5" y="1013.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="487.5" y="1663.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="812.5" y="1663.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1187.5" y="1663.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="1512.5" y="1663.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1717.0" y="1186.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="1717.0" y="1524.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1017.0" y="874.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="1017.0" y="536.0" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<text x="1535.1" y="853.7" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">1</text>
+<text x="1188.1" y="531.4" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#b91c1c">N</text>
+<rect x="2140" y="1320" width="585" height="625" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+<text x="2164" y="1358" font-size="20" font-weight="700" fill="#1f2937">Legend</text>
+<rect x="2165.0" y="1385.0" width="120" height="40" rx="3" fill="#dbeafe" stroke="#1e40af" stroke-width="2.2"/>
+<text x="2225.0" y="1405.0" font-size="14" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#1e40af">ENTITY</text>
+<text x="2315" y="1405" font-size="16" dominant-baseline="central" fill="#1f2937">Entity (becomes a table)</text>
+<polygon points="2225.0,1439.0 2285.0,1465.0 2225.0,1491.0 2165.0,1465.0" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="2225.0" y="1465.0" font-size="16" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="#78350f">Verb</text>
+<text x="2315" y="1465" font-size="16" dominant-baseline="central" fill="#1f2937">Relationship between entities</text>
+<ellipse cx="2225.0" cy="1525.0" rx="40.0" ry="21" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="2225.0" y="1525.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">name</text>
+<text x="2315" y="1525" font-size="16" dominant-baseline="central" fill="#1f2937">Attribute (becomes a column)</text>
+<ellipse cx="2225.0" cy="1585.0" rx="40.0" ry="21" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="2225.0" y="1585.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937" font-weight="700">xyz_id</text>
+<line x1="2199.2" y1="1595.0" x2="2250.8" y2="1595.0" stroke="#1f2937" stroke-width="1.5"/>
+<text x="2315" y="1585" font-size="16" dominant-baseline="central" fill="#1f2937">Key attribute = PRIMARY KEY</text>
+<ellipse cx="2225.0" cy="1645.0" rx="60.0" ry="21" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="2225.0" y="1645.0" font-size="15" text-anchor="middle" dominant-baseline="central" fill="#1f2937">xyz_id (FK)</text>
+<text x="2315" y="1645" font-size="16" dominant-baseline="central" fill="#1f2937">FOREIGN KEY column (stores a link)</text>
+<line x1="2165.0" y1="1705.0" x2="2285.0" y2="1705.0" stroke="#334155" stroke-width="1.8"/>
+<text x="2185" y="1696" font-size="19" font-weight="700" text-anchor="middle" fill="#b91c1c">1</text>
+<text x="2265" y="1696" font-size="19" font-weight="700" text-anchor="middle" fill="#b91c1c">N</text>
+<text x="2315" y="1705" font-size="16" dominant-baseline="central" fill="#1f2937">Cardinality: one-to-many (1 : N)</text>
+<line x1="2165.0" y1="1765.0" x2="2285.0" y2="1765.0" stroke="#334155" stroke-width="1.8"/>
+<text x="2315" y="1765" font-size="16" dominant-baseline="central" fill="#1f2937">Partial participation (link optional)</text>
+<line x1="2165.0" y1="1829.0" x2="2285.0" y2="1829.0" stroke="#334155" stroke-width="1.8"/>
+<line x1="2165.0" y1="1821.0" x2="2285.0" y2="1821.0" stroke="#334155" stroke-width="1.8"/>
+<text x="2315" y="1815" font-size="16" dominant-baseline="central" fill="#1f2937">Total participation (link required,</text>
+<text x="2315" y="1837" font-size="16" dominant-baseline="central" fill="#1f2937">the foreign key is NOT NULL)</text>
+<text x="2164" y="1887" font-size="15" fill="#475569">Each 1 : N relationship is stored as the (FK) column</text>
+<text x="2164" y="1911" font-size="15" fill="#475569">in the table on the N side (Has -> batch.medicine_id).</text>
+</svg>

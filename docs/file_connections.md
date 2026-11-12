@@ -88,7 +88,7 @@ flowchart TD
     R5["routes/alerts.py<br/>CALL sp_resolve_alert, sp_generate_expiry_alerts,<br/>sp_generate_low_stock_alerts<br/>view: v_open_alerts"]
     R6["routes/reports.py<br/>CALL sp_monthly_sales_report<br/>6 views: v_dashboard_summary, v_top_selling_medicines,<br/>v_expiring_soon, v_expired_stock, v_low_stock, ..."]
 
-    DBPY["backend/db.py<br/>get_connection() - reads .env"]
+    DBPY["backend/db.py<br/>get_connection, fetch_all, fetch_one,<br/>execute, call_procedure - reads .env"]
     MYSQL[("MySQL server<br/>database pharmacy_db")]
 
     VW["04_views.sql<br/>13 views"]

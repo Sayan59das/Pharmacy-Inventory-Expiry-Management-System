@@ -86,7 +86,7 @@ pharmacy-inventory-system/
 │   ├── requirements.txt
 │   ├── .env.example                template for the database login (copy to .env)
 │   ├── main.py                     starts the app, CORS, error handler
-│   ├── db.py                       one function: get_connection()
+│   ├── db.py                       5 small helpers: get_connection, fetch_all, fetch_one, execute, call_procedure
 │   └── routes/                     medicines, suppliers, purchases, sales, alerts, reports
 ├── frontend/                    React (JSX) app built with Vite
 │   ├── package.json                dependencies and npm scripts (npm run dev)
@@ -99,7 +99,9 @@ pharmacy-inventory-system/
 │       ├── components/             Layout (sidebar), Toast, Badge, Icon, PageHeader, StatCard, BillView, MedicineForm
 │       └── pages/                  Dashboard, Medicines, MedicineDetail, MedicineNew, Suppliers, Purchase, Sale, Reports
 └── docs/                        design and viva material
-    ├── er_diagram.md               ER diagram (Mermaid) + explanation
+    ├── er_diagram.md               entities, keys, relationships + both ER diagrams
+    ├── er_diagram.png / .svg       ER diagram picture (Chen notation)
+    ├── schema_diagram.png / .svg   crow's-foot diagram of the tables and keys
     ├── normalization.md            UNF -> 1NF -> 2NF -> 3NF and the 3NF proof
     ├── file_connections.md         flowchart 1: how the files connect
     ├── reading_order.md            flowchart 2: the order to read the code

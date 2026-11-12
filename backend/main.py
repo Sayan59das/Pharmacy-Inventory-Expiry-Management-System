@@ -3,52 +3,38 @@
 # WHAT IT DOES: Starts the web application:
 #                 1. creates the FastAPI app
 #                 2. switches on CORS so the React website may call it
-#                 3. plugs in the six route files (medicines, suppliers, purchases, sales, alerts, reports)
+#                 3. plugs in the six route files
 #                 4. turns MySQL errors (including our own SIGNAL messages) into clear JSON answers
 # DEPENDS ON  : db.py and the six files in routes/.
-# USED BY     : uvicorn  ->  start it with:   uvicorn main:app --reload
-#               (run that command inside the backend folder)
+# USED BY     : uvicorn  ->  start it with:   uvicorn main:app --reload   (inside the backend folder)
 # READ ORDER  : after db.py and the route files.
-#
-# AUTOMATIC DOCUMENTATION: once running, open http://127.0.0.1:8000/docs
-#               to see and test every endpoint in your browser.
+# TIP         : while it runs, open http://127.0.0.1:8000/docs to try every URL in the browser.
 # =====================================================================
 
 import mysql.connector                                   # we need its Error class for the error handler
-from fastapi import FastAPI, Request                     # FastAPI = the app; Request = an incoming HTTP request
+from fastapi import FastAPI, Request                     # FastAPI = the app; Request = an incoming request
 from fastapi.middleware.cors import CORSMiddleware       # CORS support
-from fastapi.responses import JSONResponse               # lets us build our own JSON answers
+from fastapi.responses import JSONResponse               # lets us build our own JSON answer
 
-from db import get_connection                            # used by the /health endpoint
-from routes import medicines, suppliers, purchases, sales, alerts, reports   # the six route files
+from db import fetch_one                                 # used by the /health URL
+from routes import alerts, medicines, purchases, reports, sales, suppliers
 
-
-# Create the application object. title/description appear on the /docs page.
+# Create the application. title/description appear on the /docs page.
 app = FastAPI(
     title="Pharmacy Inventory & Expiry Management API",
     description="A thin layer over MySQL: every rule lives in stored procedures, triggers and views.",
     version="1.0.0",
 )
 
+# ---------------------------------------------------------------------
+# CORS: the website runs on http://127.0.0.1:5173 and this API on port 8000.
+# A browser treats that as a different "origin" and blocks the call unless
+# the server allows it. allow_origins=["*"] allows every origin (fine for a
+# project on your own computer).
+# ---------------------------------------------------------------------
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-# ---------------------------------------------------------------------
-# CORS (Cross-Origin Resource Sharing)
-# The React website runs on its own address (http://127.0.0.1:5173), while this API
-# runs on port 8000. A browser treats that as a different "origin" and BLOCKS the call
-# unless the server says "this origin is allowed". These lines say: allow every origin.
-# (Fine for a course project on your own computer; a real website would list its own address.)
-# ---------------------------------------------------------------------
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],         # which web pages may call us: all of them
-    allow_methods=["*"],         # which HTTP methods: GET, POST, PUT ...
-    allow_headers=["*"],         # which request headers
-)
-
-
-# ---------------------------------------------------------------------
-# Plug in the route files. Each one has its own "router" with its own URLs.
-# ---------------------------------------------------------------------
+# Plug in the route files. Each has a "router" with its own URLs.
 app.include_router(medicines.router)
 app.include_router(suppliers.router)
 app.include_router(purchases.router)
@@ -58,10 +44,12 @@ app.include_router(reports.router)
 
 
 # ---------------------------------------------------------------------
-# Friendly texts for database rules. MySQL's own text for a violated CHECK or UNIQUE rule
-# mentions the constraint name (e.g. "Check constraint 'chk_batch_price' is violated").
-# If that name appears in the error, we show the plain-English sentence instead.
+# ERROR HANDLING
 # ---------------------------------------------------------------------
+
+# MySQL's text for a broken CHECK or UNIQUE rule names the rule, e.g.
+# "Check constraint 'chk_batch_price' is violated." If a rule name below appears
+# in the error, the user sees the plain sentence instead.
 FRIENDLY_MESSAGES = {
     "chk_batch_price":         "Selling price cannot be lower than the cost price.",
     "chk_batch_dates":         "Expiry date must be later than the manufacture date.",
@@ -82,65 +70,63 @@ FRIENDLY_MESSAGES = {
     "fk_batch_medicine":       "The selected medicine does not exist.",
 }
 
+# Which HTTP status code to send for which MySQL error number.
+# Any number not in this list gets 500 (unexpected server error).
+HTTP_STATUS_FOR_MYSQL_ERROR = {
+    1644: 400,   # SIGNAL SQLSTATE '45000' from our triggers/procedures (e.g. "Insufficient stock ...")
+    3819: 400,   # a CHECK constraint was violated
+    1048: 400,   # a NOT NULL column got no value
+    1265: 400,   # a value does not fit the column (e.g. wrong ENUM)
+    1366: 400,   # a value of the wrong type
+    1406: 400,   # text too long for the column
+    1292: 400,   # an invalid date
+    3140: 400,   # invalid JSON
+    1062: 409,   # duplicate value in a UNIQUE column  (409 = conflict)
+    1451: 409,   # cannot delete a parent row that still has children
+    1452: 409,   # the parent row does not exist (foreign key)
+    2003: 503,   # cannot connect to MySQL             (503 = service unavailable)
+    2002: 503,
+    2013: 503,
+    1045: 503,   # wrong user name or password
+    1049: 503,   # the database does not exist
+}
 
-# ---------------------------------------------------------------------
-# One error handler for EVERY MySQL error raised in any route.
-# Route code therefore needs no try/except for database errors.
-# ---------------------------------------------------------------------
+
+def friendly_text(mysql_text):
+    """Return the plain-English sentence for a rule name found in the MySQL text,
+    or the MySQL text itself when no rule name matches."""
+    for rule_name in FRIENDLY_MESSAGES:
+        if rule_name in mysql_text:
+            return FRIENDLY_MESSAGES[rule_name]
+    return mysql_text
+
+
+# This function runs automatically whenever ANY route raises a MySQL error.
 @app.exception_handler(mysql.connector.Error)
 async def handle_database_error(request: Request, error: mysql.connector.Error):
-    # error.errno = MySQL's error number, error.msg = MySQL's error text.
-    number = error.errno
-    message = error.msg or str(error)
+    number = error.errno                                     # MySQL's error number, e.g. 1644
+    message = friendly_text(error.msg or str(error))         # MySQL's text, made friendly
+    status_code = HTTP_STATUS_FOR_MYSQL_ERROR.get(number, 500)
 
-    # Replace a technical text by a friendly one when we know the rule's name.
-    for rule_name, friendly_text in FRIENDLY_MESSAGES.items():
-        if rule_name in message:
-            message = friendly_text
-            break
-
-    # Choose the HTTP status code from the kind of error.
-    if number == 1644:
-        # 1644 = SIGNAL SQLSTATE '45000' written by our triggers/procedures.
-        # The message is already clear (e.g. "Insufficient stock for ...").
-        status_code = 400
-    elif number in (1062, 1451, 1452):
-        # duplicate value / cannot delete a parent row / parent row missing -> conflict
-        status_code = 409
-    elif number in (3819, 1048, 1265, 1366, 1406, 1292, 3140):
-        # CHECK violated / NULL not allowed / bad or too long value / invalid JSON -> bad input
-        status_code = 400
-    elif number in (2003, 2002, 2013, 1045, 1049):
-        # cannot connect / wrong password / database missing -> the database is unavailable
-        status_code = 503
+    if status_code == 503:
         message = "Cannot reach the MySQL database. Check that MySQL is running and that backend/.env is correct. (" + message + ")"
-    else:
-        # anything else is an unexpected server-side problem
-        status_code = 500
+    if status_code == 500:
         message = "Database error " + str(number) + ": " + message
 
-    # {"detail": "..."} is the same shape FastAPI uses for its own errors, so the web page
-    # can treat all errors alike.
+    # {"detail": "..."} is the same shape FastAPI uses for its own errors.
     return JSONResponse(status_code=status_code, content={"detail": message})
 
 
 # ---------------------------------------------------------------------
-# Two small endpoints to check that everything is alive.
+# Two small URLs to check that everything is alive.
 # ---------------------------------------------------------------------
 @app.get("/", tags=["Health"])
 def home():
-    # Visiting http://127.0.0.1:8000/ shows this message.
     return {"message": "Pharmacy Inventory API is running", "documentation": "/docs"}
 
 
 @app.get("/health", tags=["Health"])
 def health():
-    # Tries to talk to MySQL. If MySQL is down, the error handler above answers with status 503.
-    connection = get_connection()                  # open a connection
-    try:
-        cursor = connection.cursor()               # a cursor sends SQL and reads answers
-        cursor.execute("SELECT 1")                 # the simplest possible query
-        cursor.fetchall()                          # read (and discard) the answer
-        return {"status": "ok", "database": "connected"}
-    finally:
-        connection.close()                         # always close the connection
+    # The simplest possible query. If MySQL is down, the error handler above answers 503.
+    fetch_one("SELECT 1 AS ok")
+    return {"status": "ok", "database": "connected"}

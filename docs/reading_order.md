@@ -109,7 +109,7 @@ flowchart TD
 
 ### C. The backend
 14. **`backend/requirements.txt`, `.env.example`** - which packages are needed and how the database password is kept out of the code.
-15. **`backend/db.py`** - the single function that opens a MySQL connection.
+15. **`backend/db.py`** - opens a MySQL connection and gives 4 small helpers (`fetch_all`, `fetch_one`, `execute`, `call_procedure`) that every route uses.
 16. **`backend/main.py`** - how the app starts, what CORS is, and how MySQL error messages (`SIGNAL`) become clear HTTP answers.
 17. **`backend/routes/medicines.py`** - how a route calls a view, parameterized queries and why they stop SQL injection.
 18. **`backend/routes/suppliers.py`** - the simplest list + add pair; reinforces the pattern.

@@ -8,64 +8,40 @@
 # DEPENDS ON  : db.py, view v_open_alerts and the three procedures named above.
 # USED BY     : frontend/src/api.js  ->  frontend/src/pages/Dashboard.jsx
 #
-# The alerts are normally created by MySQL itself (a trigger after every sale, and the daily
-# event). "/alerts/refresh" is a button for the case when the event scheduler is switched off.
+# Alerts are normally created by MySQL itself (a trigger after every sale, and the daily
+# event). "/alerts/refresh" is a button for when the event scheduler is switched off.
 # =====================================================================
 
-from fastapi import APIRouter                                 # groups the URLs of this file
+from fastapi import APIRouter
 
-from db import get_connection                                 # opens a MySQL connection
+from db import call_procedure, fetch_all
 
-# All URLs in this file start with /alerts.
+# Every URL in this file starts with /alerts.
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 
 @router.get("")
 def list_open_alerts():
-    """Return every OPEN alert, newest first."""
-    connection = get_connection()
-    try:
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM v_open_alerts")
-        return cursor.fetchall()
-    finally:
-        connection.close()
+    """Every OPEN alert, newest first."""
+    return fetch_all("SELECT * FROM v_open_alerts")
 
 
 @router.post("/refresh")
 def refresh_alerts():
-    """Run the two alert generators now (same work as the daily MySQL event)."""
-    connection = get_connection()
-    try:
-        cursor = connection.cursor(dictionary=True)
-
-        # Each procedure ends with a SELECT of its counts. We must read these result sets,
-        # otherwise the connection complains about "unread results".
-        cursor.callproc("sp_generate_expiry_alerts")
-        expiry_counts = [result.fetchall() for result in cursor.stored_results()]
-
-        cursor.callproc("sp_generate_low_stock_alerts")
-        low_stock_counts = [result.fetchall() for result in cursor.stored_results()]
-
-        return {
-            "message": "Alerts refreshed",
-            "expiry": expiry_counts[0][0] if expiry_counts and expiry_counts[0] else {},
-            "low_stock": low_stock_counts[0][0] if low_stock_counts and low_stock_counts[0] else {},
-        }
-    finally:
-        connection.close()
+    """Run the two alert procedures now (the same work as the daily MySQL event)."""
+    # Each procedure ends with ONE row of counts, e.g. {"near_expiry_alerts_added": 0, ...}.
+    # result_sets[0] = the first table it returned, [0] again = the first (only) row.
+    out_values, expiry_results = call_procedure("sp_generate_expiry_alerts")
+    out_values, low_stock_results = call_procedure("sp_generate_low_stock_alerts")
+    return {
+        "message": "Alerts refreshed",
+        "expiry": expiry_results[0][0],
+        "low_stock": low_stock_results[0][0],
+    }
 
 
 @router.post("/{alert_id}/resolve")
 def resolve_alert(alert_id: int):
-    """Mark one alert as RESOLVED. MySQL answers with an error if it is missing or already resolved."""
-    connection = get_connection()
-    try:
-        cursor = connection.cursor()
-        cursor.callproc("sp_resolve_alert", (alert_id,))
-        # The procedure ends with a SELECT of the updated alert; read it so the connection stays clean.
-        for result in cursor.stored_results():
-            result.fetchall()
-        return {"alert_id": alert_id, "message": "Alert resolved"}
-    finally:
-        connection.close()
+    """Mark one alert RESOLVED. MySQL answers with an error if it is missing or already resolved."""
+    call_procedure("sp_resolve_alert", (alert_id,))
+    return {"alert_id": alert_id, "message": "Alert resolved"}
