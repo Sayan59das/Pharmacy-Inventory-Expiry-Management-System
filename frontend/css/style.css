@@ -1,0 +1,332 @@
+/* =====================================================================
+   FILE        : frontend/css/style.css
+   WHAT IT DOES: The look of ALL pages (colours, layout, tables, forms,
+                 buttons, badges, the printable bill).
+   DEPENDS ON  : nothing.
+   USED BY     : every .html file (<link rel="stylesheet" href="css/style.css">).
+   READ ORDER  : optional - it only changes how things look, not how they work.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. COLOUR AND SIZE VARIABLES
+   A CSS variable is written --name and used as var(--name). Change a
+   colour here once and it changes on every page.
+   --------------------------------------------------------------------- */
+:root {
+    --bg: #f4f7f6;               /* page background (very light grey-green) */
+    --surface: #ffffff;          /* cards and tables */
+    --text: #1c2a26;             /* normal text */
+    --muted: #5d6f69;            /* secondary text */
+    --border: #dbe4e0;           /* thin lines */
+    --primary: #0f766e;          /* main colour: teal */
+    --primary-dark: #0b5d57;     /* darker teal for hover */
+    --primary-soft: #e3f3f0;     /* very light teal background */
+    --danger: #b42318;           /* red: expired, errors */
+    --danger-soft: #fdecea;
+    --warning: #b54708;          /* orange: near expiry, low stock */
+    --warning-soft: #fff3e0;
+    --success: #067647;          /* green: OK */
+    --success-soft: #e6f6ec;
+    --radius: 10px;              /* rounded corners */
+    --shadow: 0 1px 2px rgba(16, 40, 34, 0.06), 0 2px 8px rgba(16, 40, 34, 0.05);
+}
+
+/* ---------------------------------------------------------------------
+   2. BASIC PAGE SETTINGS
+   --------------------------------------------------------------------- */
+* { box-sizing: border-box; }       /* width includes padding and border: easier layout maths */
+
+body {
+    margin: 0;                                                    /* remove the browser's default margin */
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg);
+}
+
+h1 { font-size: 1.6rem; margin: 0; }
+h2 { font-size: 1.1rem; margin: 0 0 12px 0; }
+p  { margin: 0; }
+a  { color: var(--primary); }
+
+/* ---------------------------------------------------------------------
+   3. TOP NAVIGATION BAR
+   --------------------------------------------------------------------- */
+.topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;                /* stays visible while scrolling */
+    top: 0;
+    z-index: 10;
+}
+.topbar-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    min-height: 56px;
+    flex-wrap: wrap;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
+    text-decoration: none;
+}
+.brand-mark {                        /* the small teal square with a plus sign */
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--primary);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.topbar nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.topbar nav a {
+    padding: 7px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--muted);
+    font-weight: 500;
+}
+.topbar nav a:hover { background: var(--primary-soft); color: var(--primary-dark); }
+.topbar nav a[aria-current="page"] { background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+
+/* ---------------------------------------------------------------------
+   4. PAGE LAYOUT
+   --------------------------------------------------------------------- */
+.container { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.subtitle { color: var(--muted); margin-top: 2px; }
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+.card-header {                       /* title on the left, buttons on the right */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.card-header h2 { margin: 0; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.hidden { display: none !important; }              /* used by JavaScript to hide/show things */
+
+/* ---------------------------------------------------------------------
+   5. DASHBOARD STAT CARDS
+   --------------------------------------------------------------------- */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left-width: 5px;                         /* coloured stripe on the left */
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+}
+.stat-value { font-size: 1.9rem; font-weight: 700; line-height: 1.2; }
+.stat-label { color: var(--muted); font-size: 0.85rem; }
+.stat.danger  { border-left-color: var(--danger); }
+.stat.warning { border-left-color: var(--warning); }
+.stat.info    { border-left-color: var(--primary); }
+.stat.success { border-left-color: var(--success); }
+
+/* ---------------------------------------------------------------------
+   6. TABLES
+   --------------------------------------------------------------------- */
+.table-wrap { overflow-x: auto; }                   /* wide tables scroll sideways on small screens */
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    background: #f8faf9;
+    white-space: nowrap;
+}
+tbody tr:hover { background: #f8fbfa; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }   /* numbers line up on the right */
+.empty { color: var(--muted); text-align: center; padding: 22px 10px; }
+
+/* ---------------------------------------------------------------------
+   7. BADGES (small coloured labels)
+   --------------------------------------------------------------------- */
+.badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.badge.danger  { background: var(--danger-soft);  color: var(--danger); }
+.badge.warning { background: var(--warning-soft); color: var(--warning); }
+.badge.success { background: var(--success-soft); color: var(--success); }
+.badge.info    { background: var(--primary-soft); color: var(--primary-dark); }
+.badge.neutral { background: #eceff1; color: #455a64; }
+
+/* ---------------------------------------------------------------------
+   8. BUTTONS
+   --------------------------------------------------------------------- */
+.btn {
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: var(--surface); color: var(--primary-dark); border-color: var(--border); }
+.btn-secondary:hover { background: var(--primary-soft); }
+.btn-danger { background: var(--surface); color: var(--danger); border-color: #f1c4bf; }
+.btn-danger:hover { background: var(--danger-soft); }
+.btn-small { padding: 4px 10px; font-size: 0.82rem; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------
+   9. FORMS
+   --------------------------------------------------------------------- */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px 16px;
+    margin-bottom: 14px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+.field.checkbox { flex-direction: row; align-items: center; gap: 8px; padding-top: 22px; }
+.field.checkbox label { font-size: 0.95rem; color: var(--text); }
+
+input[type="text"], input[type="number"], input[type="date"], input[type="search"], input[type="email"], select {
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    width: 100%;
+}
+input:focus, select:focus {
+    outline: 2px solid var(--primary-soft);
+    border-color: var(--primary);
+}
+.form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.hint { color: var(--muted); font-size: 0.85rem; margin-bottom: 10px; }
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.toolbar input[type="search"] { max-width: 340px; }
+
+/* the item rows of the purchase page and the cart row of the sale page */
+.item-row-table input { min-width: 90px; }
+.item-row-table select { min-width: 190px; }
+.nowrap { white-space: nowrap; }                      /* keeps values such as batch numbers on one line */
+.add-line {
+    display: grid;
+    grid-template-columns: 1fr 120px auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 14px;
+}
+
+/* ---------------------------------------------------------------------
+   10. TABS (reports page)
+   --------------------------------------------------------------------- */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.tab {
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+}
+.tab:hover { background: var(--primary-soft); }
+.tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* ---------------------------------------------------------------------
+   11. MESSAGE POP-UPS ("toasts") in the top-right corner
+   --------------------------------------------------------------------- */
+#toastBox {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    max-width: 380px;
+}
+.toast {
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    background: var(--success);
+    color: #fff;
+    font-weight: 500;
+}
+.toast.error { background: var(--danger); }
+
+/* ---------------------------------------------------------------------
+   12. THE BILL (shown on the sale page and printed)
+   --------------------------------------------------------------------- */
+.bill { max-width: 760px; margin: 0 auto; }
+.bill-head { text-align: center; border-bottom: 2px dashed var(--border); padding-bottom: 12px; margin-bottom: 12px; }
+.bill-head h2 { font-size: 1.3rem; margin-bottom: 2px; }
+.bill-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 20px; margin-bottom: 12px; font-size: 0.92rem; }
+.bill-totals { margin-left: auto; margin-top: 12px; width: 280px; }
+.bill-totals div { display: flex; justify-content: space-between; padding: 3px 0; }
+.bill-totals .grand { font-size: 1.15rem; font-weight: 700; border-top: 2px solid var(--text); margin-top: 6px; padding-top: 8px; }
+.bill-note { color: var(--muted); font-size: 0.82rem; margin-top: 14px; text-align: center; }
+
+/* ---------------------------------------------------------------------
+   13. SMALL SCREENS
+   --------------------------------------------------------------------- */
+@media (max-width: 800px) {
+    .two-col { grid-template-columns: 1fr; }
+    .add-line { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------
+   14. PRINTING: only the bill is printed, everything else is hidden
+   --------------------------------------------------------------------- */
+@media print {
+    body * { visibility: hidden; }                       /* hide everything ... */
+    #billPanel, #billPanel * { visibility: visible; }    /* ... except the bill */
+    #billPanel { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; border: none; }
+    .no-print { display: none !important; }
+}

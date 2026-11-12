@@ -1,0 +1,15 @@
+﻿# =====================================================================
+# FILE        : .gitignore
+# WHAT IT DOES: Tells Git which files must NEVER be uploaded to GitHub.
+# DEPENDS ON  : nothing.    USED BY: Git.
+# =====================================================================
+
+# Your real database password lives in backend/.env - never share it.
+# (backend/.env.example is the safe template and IS uploaded.)
+.env
+
+# Python's private environment and temporary files.
+venv/
+.venv/
+__pycache__/
+*.pyc

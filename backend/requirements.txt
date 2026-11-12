@@ -1,0 +1,22 @@
+# =====================================================================
+# FILE        : backend/requirements.txt
+# WHAT IT DOES: Lists the Python packages the backend needs.
+#               Install them all with:   pip install -r requirements.txt
+# DEPENDS ON  : nothing (it is only read by pip)
+# USED BY     : you, once, during setup (see README.md)
+# TESTED WITH : Python 3.12, fastapi 0.162, uvicorn 0.54, mysql-connector-python 26.10,
+#               python-dotenv 1.2 (the ">=" lines below accept these and newer versions)
+# =====================================================================
+
+# FastAPI: the web framework that turns Python functions into HTTP endpoints.
+# (Version 0.100 or newer is needed because we use Pydantic v2.)
+fastapi>=0.100
+
+# Uvicorn: the web server that runs the FastAPI app (start it with: uvicorn main:app --reload).
+uvicorn[standard]>=0.29
+
+# mysql-connector-python: the official MySQL driver. It lets Python send SQL to MySQL.
+mysql-connector-python>=8.4
+
+# python-dotenv: reads the .env file (database host, user, password ...) into environment variables.
+python-dotenv>=1.0

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!--
+=====================================================================
+FILE        : frontend/reports.html
+WHAT IT DOES: Six reports in tabs: Monthly sales, Top-selling medicines, Expiring soon,
+              Expired stock, Low stock, Supplier summary. Every report is a MySQL view or
+              procedure; this page only displays the result.
+DEPENDS ON  : css/style.css, js/api.js, js/reports.js and the running backend.
+USED BY     : you - open it from the "Reports" link in the navigation bar.
+BACKEND CALLS: /reports/monthly-sales, /reports/top-selling, /reports/expiring-soon,
+              /reports/expired, /reports/low-stock, /reports/supplier-summary (through api.js)
+=====================================================================
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reports - Pharmacy Inventory</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="index.html"><span class="brand-mark">+</span> Pharmacy Inventory</a>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="medicines.html">Medicines</a>
+                <a href="suppliers.html">Suppliers</a>
+                <a href="purchase.html">Purchase</a>
+                <a href="sale.html">Sale</a>
+                <a href="reports.html" aria-current="page">Reports</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <h1>Reports</h1>
+                <p class="subtitle">Every number comes straight from a MySQL view or stored procedure</p>
+            </div>
+        </div>
+
+        <!-- ========== the tab buttons (data-tab says which section a button opens) ========== -->
+        <div class="tabs">
+            <button class="tab active" data-tab="monthly">Monthly sales</button>
+            <button class="tab" data-tab="top">Top selling</button>
+            <button class="tab" data-tab="expiring">Expiring soon</button>
+            <button class="tab" data-tab="expired">Expired stock</button>
+            <button class="tab" data-tab="low">Low stock</button>
+            <button class="tab" data-tab="suppliers">Suppliers</button>
+        </div>
+
+        <!-- ========== 1. monthly sales ========== -->
+        <section id="tab-monthly">
+            <div class="card">
+                <div class="toolbar">
+                    <div class="field" style="width:160px"><label for="monthSelect">Month</label><select id="monthSelect"></select></div>
+                    <div class="field" style="width:120px"><label for="yearInput">Year</label><input type="number" id="yearInput" min="2000" max="2100"></div>
+                    <div class="field"><label>&nbsp;</label><button id="loadMonthlyButton" class="btn btn-primary" type="button">Show report</button></div>
+                </div>
+                <div class="stat-grid" id="monthlyCards"></div>
+            </div>
+            <div class="two-col">
+                <div class="card">
+                    <h2>By payment mode</h2>
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>Payment mode</th><th class="num">Bills</th><th class="num">Amount</th></tr></thead>
+                        <tbody id="monthlyPaymentBody"></tbody>
+                    </table></div>
+                </div>
+                <div class="card">
+                    <h2>Top medicines of the month</h2>
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>Medicine</th><th class="num">Units sold</th><th class="num">Revenue</th></tr></thead>
+                        <tbody id="monthlyTopBody"></tbody>
+                    </table></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 2. top selling ========== -->
+        <section id="tab-top" class="card hidden">
+            <h2>Top-selling medicines (all time)</h2>
+            <div class="table-wrap"><table>
+                <thead><tr><th>#</th><th>Medicine</th><th>Category</th><th class="num">Units sold</th><th class="num">Bills</th><th class="num">Revenue</th></tr></thead>
+                <tbody id="topBody"></tbody>
+            </table></div>
+        </section>
+
+        <!-- ========== 3. expiring soon ========== -->
+        <section id="tab-expiring" class="card hidden">
+            <h2>Batches expiring within 30 days</h2>
+            <div class="table-wrap"><table>
+                <thead><tr><th>Medicine</th><th>Batch</th><th>Supplier</th><th>Expires</th><th class="num">Days left</th><th class="num">Units</th><th class="num">Value at cost</th></tr></thead>
+                <tbody id="expiringBody"></tbody>
+            </table></div>
+        </section>
+
+        <!-- ========== 4. expired ========== -->
+        <section id="tab-expired" class="card hidden">
+            <h2>Expired batches still in stock</h2>
+            <div class="table-wrap"><table>
+                <thead><tr><th>Medicine</th><th>Batch</th><th>Supplier</th><th>Expired on</th><th class="num">Days ago</th><th class="num">Units</th><th class="num">Loss at cost</th></tr></thead>
+                <tbody id="expiredBody"></tbody>
+            </table></div>
+        </section>
+
+        <!-- ========== 5. low stock ========== -->
+        <section id="tab-low" class="card hidden">
+            <h2>Medicines below their reorder level</h2>
+            <div class="table-wrap"><table>
+                <thead><tr><th>Medicine</th><th>Category</th><th class="num">Sellable</th><th class="num">Expired (not counted)</th><th class="num">Reorder level</th><th class="num">Shortfall</th></tr></thead>
+                <tbody id="lowBody"></tbody>
+            </table></div>
+        </section>
+
+        <!-- ========== 6. suppliers ========== -->
+        <section id="tab-suppliers" class="card hidden">
+            <h2>Purchases per supplier</h2>
+            <div class="table-wrap"><table>
+                <thead><tr><th>Supplier</th><th class="num">Invoices</th><th class="num">Units bought</th><th class="num">Amount spent</th><th>Last purchase</th></tr></thead>
+                <tbody id="suppliersBody"></tbody>
+            </table></div>
+        </section>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>
