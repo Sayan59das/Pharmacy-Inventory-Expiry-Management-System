@@ -9,7 +9,7 @@
 #                 GET /reports/low-stock         medicines below the reorder level    -> view v_low_stock
 #                 GET /reports/supplier-summary  purchases per supplier               -> view v_supplier_purchase_summary
 # DEPENDS ON  : db.py and the views / procedure named above.
-# USED BY     : frontend/js/api.js  ->  frontend/js/dashboard.js and reports.js
+# USED BY     : frontend/src/api.js  ->  pages/Dashboard.jsx and pages/Reports.jsx
 # =====================================================================
 
 from datetime import date                                     # date.today() gives today's date

@@ -248,6 +248,13 @@ SELECT
     cs.total_quantity,
     cs.sellable_quantity,
     cs.expired_quantity,
+    -- A ready-made status word for the web page, decided HERE in MySQL (not in JavaScript):
+    --   OUT = nothing sellable, LOW = below the reorder level, OK = enough stock.
+    CASE
+        WHEN cs.sellable_quantity = 0               THEN 'OUT'
+        WHEN cs.sellable_quantity < m.reorder_level THEN 'LOW'
+        ELSE 'OK'
+    END AS stock_status,
     -- Price of the next batch to be sold: sellable, has stock, earliest expiry first.
     -- A subquery in the SELECT list returns exactly one value per medicine.
     (SELECT b.selling_price

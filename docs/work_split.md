@@ -56,10 +56,10 @@ READ ORDER  : after docs/reading_order.md.
 ### Member 4 - Backend, Frontend & Docs
 * The request journey: button click -> page script -> `api.js` -> FastAPI route -> `db.py` -> MySQL -> back to the page.
 * Why Python holds **no** business logic and how every route only calls a view or a procedure.
-* **SQL injection** and how parameterized queries (`%s`) prevent it; also XSS and why `escapeHtml()` exists.
+* **SQL injection** and how parameterized queries (`%s`) prevent it; also XSS: React escapes every value it puts on the page, so a medicine named `<script>` is shown as text, never run.
 * CORS (what it is and why it is enabled), how MySQL `SIGNAL` messages become HTTP 400 answers (`main.py`), HTTP status codes used (200, 201, 400, 404, 409, 422, 503).
 * How `callproc` returns `OUT` parameters and several result sets; why the cart is sent as JSON.
-* The pages: dashboard, medicines, suppliers, purchase, sale (cart + printable bill), reports.
+* The React app: components, props, state (`useState`), effects (`useEffect`), the `useLoad` hook, controlled form inputs and react-router; the pages: dashboard, medicines (list / detail / add), suppliers, purchase, sale (cart + printable bill), reports.
 * `README.md` setup steps, the two flowcharts, and `docs/viva_questions.md`.
 * **Demo role:** run the whole web demo (see section 4).
 

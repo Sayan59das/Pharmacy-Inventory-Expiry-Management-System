@@ -8,7 +8,7 @@
 #                 PUT  /medicines/{id}              edit a medicine
 # DEPENDS ON  : db.py (get_connection) and the MySQL views v_medicine_catalog and
 #               v_batch_details (database/04_views.sql).
-# USED BY     : frontend/js/api.js  ->  frontend/js/medicines.js, purchase.js, sale.js
+# USED BY     : frontend/src/api.js  ->  pages/Medicines.jsx, MedicineDetail.jsx, MedicineNew.jsx, Purchase.jsx, Sale.jsx
 #
 # HOW SQL INJECTION IS PREVENTED  (viva question!)
 #   SQL injection happens when user text is glued into the SQL string, e.g.

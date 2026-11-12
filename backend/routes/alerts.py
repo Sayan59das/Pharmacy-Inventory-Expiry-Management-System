@@ -6,7 +6,7 @@
 #                 POST /alerts/refresh        create missing alerts right now -> procedures sp_generate_expiry_alerts
 #                                                                                and sp_generate_low_stock_alerts
 # DEPENDS ON  : db.py, view v_open_alerts and the three procedures named above.
-# USED BY     : frontend/js/api.js  ->  frontend/js/dashboard.js
+# USED BY     : frontend/src/api.js  ->  frontend/src/pages/Dashboard.jsx
 #
 # The alerts are normally created by MySQL itself (a trigger after every sale, and the daily
 # event). "/alerts/refresh" is a button for the case when the event scheduler is switched off.

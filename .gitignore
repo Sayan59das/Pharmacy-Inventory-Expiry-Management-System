@@ -13,3 +13,10 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+
+# React frontend: installed packages and the production build are re-created by npm.
+node_modules/
+frontend/dist/
+
+# Design-tool scratch files (decision sketches, review screenshots).
+.impeccable/

@@ -1,0 +1,21 @@
+{
+  "name": "pharmacy-inventory-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "React (JSX) frontend for the Pharmacy Inventory & Expiry Management System. It only calls the FastAPI backend; all business rules live in MySQL.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^8.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "vite": "^8.3.8"
+  }
+}

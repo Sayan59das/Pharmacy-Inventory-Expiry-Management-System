@@ -1,105 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <!--
 =====================================================================
 FILE        : frontend/index.html
-WHAT IT DOES: The DASHBOARD: counts of low-stock, near-expiry and expired
-              items, today's sales, the list of open alerts (with a
-              "Resolve" button) and two small tables.
-DEPENDS ON  : css/style.css, js/api.js, js/dashboard.js and the running backend.
-USED BY     : you - this is the page you open first (it is the home page).
-BACKEND CALLS: /reports/dashboard, /alerts, /alerts/{id}/resolve, /alerts/refresh,
-              /reports/low-stock, /reports/expiring-soon   (through api.js)
+WHAT IT DOES: The ONE html page of the React app. It is almost empty: React draws
+              every screen inside <div id="root">. Vite loads src/main.jsx from here.
+DEPENDS ON  : src/main.jsx (the JavaScript entry point).
+USED BY     : the browser (Vite serves it at http://127.0.0.1:5173).
+READ ORDER  : first file of the frontend, then src/main.jsx.
 =====================================================================
 -->
 <html lang="en">
-<head>
-    <!-- Character set: lets the page show the rupee sign and other symbols correctly -->
-    <meta charset="utf-8">
-    <!-- Makes the page fit phone screens -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard - Pharmacy Inventory</title>
-    <!-- All the colours and layout -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <!-- ========== top navigation bar (the same on every page) ========== -->
-    <header class="topbar">
-        <div class="topbar-inner">
-            <a class="brand" href="index.html"><span class="brand-mark">+</span> Pharmacy Inventory</a>
-            <nav>
-                <!-- aria-current="page" highlights the link of the page you are on -->
-                <a href="index.html" aria-current="page">Dashboard</a>
-                <a href="medicines.html">Medicines</a>
-                <a href="suppliers.html">Suppliers</a>
-                <a href="purchase.html">Purchase</a>
-                <a href="sale.html">Sale</a>
-                <a href="reports.html">Reports</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container">
-        <!-- Page title and the "Refresh alerts" button -->
-        <div class="page-header">
-            <div>
-                <h1>Dashboard</h1>
-                <p class="subtitle">Stock health at a glance</p>
-            </div>
-            <button id="refreshAlertsButton" class="btn btn-secondary" type="button">Refresh alerts</button>
-        </div>
-
-        <!-- ========== the six number cards (filled by dashboard.js) ========== -->
-        <section class="stat-grid">
-            <div class="stat warning"><div class="stat-value" id="statLowStock">-</div><div class="stat-label">Low-stock medicines</div></div>
-            <div class="stat warning"><div class="stat-value" id="statNearExpiry">-</div><div class="stat-label">Batches expiring in 30 days</div></div>
-            <div class="stat danger"><div class="stat-value" id="statExpired">-</div><div class="stat-label">Expired batches in stock</div></div>
-            <div class="stat danger"><div class="stat-value" id="statOpenAlerts">-</div><div class="stat-label">Open alerts</div></div>
-            <div class="stat info"><div class="stat-value" id="statMedicines">-</div><div class="stat-label">Medicines</div></div>
-            <div class="stat success"><div class="stat-value" id="statTodaySales">-</div><div class="stat-label">Sales today</div></div>
-        </section>
-
-        <!-- ========== open alerts ========== -->
-        <section class="card">
-            <div class="card-header">
-                <h2>Open alerts</h2>
-                <span class="subtitle">Created automatically by MySQL triggers and the daily event</span>
-            </div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr><th>Type</th><th>Medicine</th><th>Batch</th><th>Details</th><th>Raised</th><th></th></tr>
-                    </thead>
-                    <!-- dashboard.js fills this table body -->
-                    <tbody id="alertsBody"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ========== two small tables side by side ========== -->
-        <div class="two-col">
-            <section class="card">
-                <h2>Low stock</h2>
-                <div class="table-wrap">
-                    <table>
-                        <thead><tr><th>Medicine</th><th class="num">Sellable</th><th class="num">Reorder at</th></tr></thead>
-                        <tbody id="lowStockBody"><tr><td colspan="3" class="empty">Loading...</td></tr></tbody>
-                    </table>
-                </div>
-            </section>
-            <section class="card">
-                <h2>Expiring within 30 days</h2>
-                <div class="table-wrap">
-                    <table>
-                        <thead><tr><th>Medicine</th><th>Batch</th><th class="num">Days left</th><th class="num">Units</th></tr></thead>
-                        <tbody id="expiringBody"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- First the shared helper file, then this page's own script (order matters) -->
-    <script src="js/api.js"></script>
-    <script src="js/dashboard.js"></script>
-</body>
+  <head>
+    <!-- Character set: shows the rupee sign and every other symbol correctly -->
+    <meta charset="UTF-8" />
+    <!-- Makes the layout fit the screen width on laptops and phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tab icon: a small blue square with a white plus, drawn in SVG -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M16 9v14M9 16h14' stroke='white' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <!-- The Inter font from Google Fonts (if there is no internet the system font is used) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>Pharmacy Inventory</title>
+  </head>
+  <body>
+    <!-- React puts the whole application inside this div -->
+    <div id="root"></div>
+    <!-- Start the React app (type="module" lets the file use import/export) -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

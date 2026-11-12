@@ -65,19 +65,19 @@ flowchart TD
 ## Part B - the website: from a click to MySQL and back
 
 ```
-browser page -> js file -> api.js -> FastAPI route -> db.py -> MySQL (procedure / view / table)
+browser page -> React component -> api.js -> FastAPI route -> db.py -> MySQL (procedure / view / table)
 ```
 
 ```mermaid
 flowchart TD
-    H1["index.html<br/>+ dashboard.js"]
-    H2["medicines.html<br/>+ medicines.js"]
-    H3["suppliers.html<br/>+ suppliers.js"]
-    H4["purchase.html<br/>+ purchase.js"]
-    H5["sale.html<br/>+ sale.js"]
-    H6["reports.html<br/>+ reports.js"]
+    H1["pages/Dashboard.jsx<br/>address /"]
+    H2["pages/Medicines.jsx<br/>+ MedicineDetail, MedicineNew"]
+    H3["pages/Suppliers.jsx<br/>address /suppliers"]
+    H4["pages/Purchase.jsx<br/>address /purchase"]
+    H5["pages/Sale.jsx<br/>+ BillView"]
+    H6["pages/Reports.jsx<br/>address /reports"]
 
-    API["frontend/js/api.js<br/>every fetch() call lives here"]
+    API["frontend/src/api.js<br/>every fetch() call lives here"]
 
     MAIN["backend/main.py<br/>app, CORS, MySQL-error handler"]
 
@@ -136,8 +136,8 @@ flowchart TD
 
 **In words**
 
-1. **The pages (blue) never talk to MySQL.** Every page loads `api.js` plus its own script. The script calls
-   `api.something()`, `api.js` sends the HTTP request, the backend answers, the script draws the result.
+1. **The pages (blue) never talk to MySQL.** Every React page imports `api` from `api.js` and calls
+   `api.something()`; `api.js` sends the HTTP request, the backend answers, React stores the answer in state and draws it.
 2. **The backend (green) is a thin messenger.** `main.py` plugs in the six route files. Every route asks
    `db.py` for a connection and then runs exactly one thing in MySQL: a `SELECT` on a **view**, a `CALL` of a
    **procedure**, or (for plain add/edit forms) a simple `INSERT`/`UPDATE` on a **table**.
@@ -153,28 +153,28 @@ flowchart TD
 
 ## Table 1 - which web page uses which script and which backend URL
 
-| Page | Script | Backend URLs it calls (through `api.js`) | MySQL object behind each URL |
+| Address | React page | Backend URLs it calls (through `api.js`) | MySQL object behind each URL |
 |------|--------|------------------------------------------|------------------------------|
-| `index.html` | `dashboard.js` | `GET /reports/dashboard` | view `v_dashboard_summary` |
+| `/` | `Dashboard.jsx` | `GET /reports/dashboard` | view `v_dashboard_summary` |
 | | | `GET /alerts` | view `v_open_alerts` |
 | | | `POST /alerts/{id}/resolve` | procedure `sp_resolve_alert` |
 | | | `POST /alerts/refresh` | procedures `sp_generate_expiry_alerts`, `sp_generate_low_stock_alerts` |
 | | | `GET /reports/low-stock`, `GET /reports/expiring-soon` | views `v_low_stock`, `v_expiring_soon` |
-| `medicines.html` | `medicines.js` | `GET /medicines` (`?search=`) | view `v_medicine_catalog` |
+| `/medicines`, `/medicines/:id`, `/medicines/new` | `Medicines.jsx`, `MedicineDetail.jsx`, `MedicineNew.jsx` | `GET /medicines` (`?search=`) | view `v_medicine_catalog` |
 | | | `GET /medicines/categories` | table `category` |
 | | | `GET /medicines/{id}/batches` | view `v_batch_details` |
 | | | `POST /medicines`, `PUT /medicines/{id}` | table `medicine` (INSERT / UPDATE) |
-| `suppliers.html` | `suppliers.js` | `GET /suppliers` | view `v_supplier_purchase_summary` + table `supplier` |
+| `/suppliers` | `Suppliers.jsx` | `GET /suppliers` | view `v_supplier_purchase_summary` + table `supplier` |
 | | | `POST /suppliers` | table `supplier` (INSERT) |
-| `purchase.html` | `purchase.js` | `GET /suppliers`, `GET /medicines` | (as above) |
+| `/purchase` | `Purchase.jsx` | `GET /suppliers`, `GET /medicines` | (as above) |
 | | | `POST /purchases` | procedure `sp_add_purchase` (+ triggers 1 and 2) |
 | | | `GET /purchases` | view `v_purchase_list` |
-| `sale.html` | `sale.js` | `GET /sales/customers`, `POST /sales/customers` | table `customer` |
+| `/sale` | `Sale.jsx` (+ `BillView.jsx`) | `GET /sales/customers`, `POST /sales/customers` | table `customer` |
 | | | `GET /medicines` | view `v_medicine_catalog` |
 | | | `POST /sales` | procedure `sp_make_bill` -> `sp_add_medicine_to_sale` (+ triggers 3, 4, 5) |
 | | | `GET /sales/{id}/bill` | procedure `sp_generate_bill` (reads view `v_sale_bill`) |
 | | | `GET /sales` | view `v_sale_list` |
-| `reports.html` | `reports.js` | `GET /reports/monthly-sales` | procedure `sp_monthly_sales_report` |
+| `/reports?tab=...` | `Reports.jsx` | `GET /reports/monthly-sales` | procedure `sp_monthly_sales_report` |
 | | | `GET /reports/top-selling` | view `v_top_selling_medicines` |
 | | | `GET /reports/expiring-soon`, `/expired`, `/low-stock` | views `v_expiring_soon`, `v_expired_stock`, `v_low_stock` |
 | | | `GET /reports/supplier-summary` | view `v_supplier_purchase_summary` |

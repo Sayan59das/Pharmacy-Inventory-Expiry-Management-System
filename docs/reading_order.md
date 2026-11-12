@@ -54,13 +54,13 @@ flowchart TD
     end
 
     subgraph D["D. Frontend"]
-        N23["Step 23: js/api.js"]
-        N24["Step 24: index.html + dashboard.js"]
-        N25["Step 25: medicines + suppliers pages"]
-        N26["Step 26: purchase.html + purchase.js"]
-        N27["Step 27: sale.html + sale.js"]
-        N28["Step 28: reports.html + reports.js"]
-        N29["Step 29: css/style.css"]
+        N23["Step 23: src/api.js + useLoad.js"]
+        N24["Step 24: main.jsx, App.jsx, Layout"]
+        N25["Step 25: Dashboard + Medicines pages"]
+        N26["Step 26: Purchase + Suppliers pages"]
+        N27["Step 27: Sale page + BillView"]
+        N28["Step 28: Reports page"]
+        N29["Step 29: src/styles.css"]
         N23 --> N24 --> N25 --> N26 --> N27 --> N28 --> N29
     end
 
@@ -119,13 +119,13 @@ flowchart TD
 22. **`backend/routes/reports.py`** - reports as views, and a procedure that returns three result sets.
 
 ### D. The frontend
-23. **`frontend/js/api.js`** - the one place where every `fetch()` lives, how errors become readable messages, and the helper functions.
-24. **`frontend/index.html` + `js/dashboard.js`** - how a page loads data, fills cards and tables, and handles button clicks.
-25. **`medicines.html`/`.js` and `suppliers.html`/`.js`** - forms that add and edit records, search with a delay (debouncing).
-26. **`purchase.html` + `js/purchase.js`** - building a form with a variable number of rows and sending it as one request.
-27. **`sale.html` + `js/sale.js`** - the shopping cart, the printable bill, and why the page never chooses batches or prices.
-28. **`reports.html` + `js/reports.js`** - tabs and loading each report on demand.
-29. **`frontend/css/style.css`** - optional: colours, layout and the print style for the bill.
+23. **`frontend/src/api.js`, `useLoad.js`, `utils.js`** - the one place where every `fetch()` lives, how errors become readable messages, and the hook that loads data into React state.
+24. **`frontend/index.html`, `src/main.jsx`, `App.jsx`, `components/Layout.jsx`** - how React starts, how addresses map to pages (react-router), and the sidebar frame around every page.
+25. **`pages/Dashboard.jsx`, `Medicines.jsx`, `MedicineDetail.jsx`, `MedicineNew.jsx`** - state and effects, tables built from data, search with a delay (debouncing), forms with controlled inputs.
+26. **`pages/Purchase.jsx`, `Suppliers.jsx`** - a form with a variable number of rows kept in state and sent as one request.
+27. **`pages/Sale.jsx`, `components/BillView.jsx`** - the shopping cart, the printable bill, and why the page never chooses batches or prices.
+28. **`pages/Reports.jsx`** - tabs kept in the address (`?tab=low`) and loading each report on demand.
+29. **`frontend/src/styles.css`** - optional: design tokens (colours, spacing), sidebar layout and the print style for the bill.
 
 ### E. Wrap up
 30. **`docs/file_connections.md`** - the big picture of how all files connect (flowchart 1).

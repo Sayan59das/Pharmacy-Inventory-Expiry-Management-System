@@ -4,7 +4,7 @@
 #                 GET  /suppliers     list suppliers with their purchase totals
 #                 POST /suppliers     add a supplier
 # DEPENDS ON  : db.py and the MySQL view v_supplier_purchase_summary.
-# USED BY     : frontend/js/api.js  ->  frontend/js/suppliers.js, purchase.js
+# USED BY     : frontend/src/api.js  ->  pages/Suppliers.jsx, pages/Purchase.jsx
 # (Parameterized queries are explained in routes/medicines.py.)
 # =====================================================================
 

@@ -8,7 +8,7 @@
 #                 GET  /sales/{id}/bill      the printable bill with GST and totals   -> procedure sp_generate_bill
 #                 GET  /sales                the 20 most recent bills                 -> view v_sale_list
 # DEPENDS ON  : db.py, procedures sp_make_bill / sp_make_sale / sp_generate_bill, view v_sale_list.
-# USED BY     : frontend/js/api.js  ->  frontend/js/sale.js
+# USED BY     : frontend/src/api.js  ->  frontend/src/pages/Sale.jsx
 #
 # FEFO (First Expired, First Out) is done by MySQL inside sp_add_medicine_to_sale: Python never
 # chooses a batch. If the stock is not enough, or a batch has expired, MySQL answers with an

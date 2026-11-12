@@ -5,7 +5,7 @@
 #                                     -> calls the MySQL procedure sp_add_purchase
 #                 GET  /purchases     the most recent purchase invoices (view v_purchase_list)
 # DEPENDS ON  : db.py, procedure sp_add_purchase, view v_purchase_list.
-# USED BY     : frontend/js/api.js  ->  frontend/js/purchase.js
+# USED BY     : frontend/src/api.js  ->  frontend/src/pages/Purchase.jsx
 #
 # WHAT THE PROCEDURE DOES (so Python does not have to): it creates the invoice, creates or tops up
 # every batch, and the trigger trg_purchase_item_after_insert adds the stock. If ANY item is

@@ -2,7 +2,7 @@
 # FILE        : backend/main.py
 # WHAT IT DOES: Starts the web application:
 #                 1. creates the FastAPI app
-#                 2. switches on CORS so the HTML pages may call it
+#                 2. switches on CORS so the React website may call it
 #                 3. plugs in the six route files (medicines, suppliers, purchases, sales, alerts, reports)
 #                 4. turns MySQL errors (including our own SIGNAL messages) into clear JSON answers
 # DEPENDS ON  : db.py and the six files in routes/.
@@ -33,7 +33,7 @@ app = FastAPI(
 
 # ---------------------------------------------------------------------
 # CORS (Cross-Origin Resource Sharing)
-# The HTML pages are opened from files (or another port such as :5500), while this API
+# The React website runs on its own address (http://127.0.0.1:5173), while this API
 # runs on port 8000. A browser treats that as a different "origin" and BLOCKS the call
 # unless the server says "this origin is allowed". These lines say: allow every origin.
 # (Fine for a course project on your own computer; a real website would list its own address.)

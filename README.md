@@ -53,15 +53,15 @@ procedures and a scheduled event). The Python backend and the web pages only *ca
 |-------|-----------|-----|
 | Database | **MySQL 8** (InnoDB) | Tables, `CHECK`, foreign keys, views, triggers, procedures, events, window functions, JSON |
 | Backend | **Python 3 + FastAPI** + `mysql-connector-python` | Tiny layer that calls procedures and views with parameterized queries (no ORM) |
-| Frontend | Plain **HTML + CSS + JavaScript** | No framework: every line can be explained |
+| Frontend | **React (JSX) + Vite**, react-router, plain CSS | Component-based pages; no UI library, so every line can be explained |
 | Docs | Markdown + Mermaid | ER diagram and flowcharts that render on GitHub / VS Code |
 
 ## 4. How a click reaches the database
 
 ```
-button click -> page js (sale.js) -> api.js (fetch) -> FastAPI route (routes/sales.py)
+button click -> React page (Sale.jsx) -> api.js (fetch) -> FastAPI route (routes/sales.py)
              -> db.py (connection) -> MySQL procedure sp_make_bill -> triggers
-             -> answer travels back the same way -> the page draws the bill
+             -> answer travels back the same way -> React stores it in state and draws the bill
 ```
 
 Details and the full map: [`docs/file_connections.md`](docs/file_connections.md).
@@ -88,11 +88,16 @@ pharmacy-inventory-system/
 │   ├── main.py                     starts the app, CORS, error handler
 │   ├── db.py                       one function: get_connection()
 │   └── routes/                     medicines, suppliers, purchases, sales, alerts, reports
-├── frontend/                    plain HTML + CSS + JavaScript
-│   ├── index.html                  dashboard
-│   ├── medicines.html  suppliers.html  purchase.html  sale.html  reports.html
-│   ├── css/style.css
-│   └── js/                         api.js (all fetch calls) + one js file per page
+├── frontend/                    React (JSX) app built with Vite
+│   ├── package.json                dependencies and npm scripts (npm run dev)
+│   ├── index.html                  the one html page; React draws into <div id="root">
+│   └── src/
+│       ├── main.jsx  App.jsx       entry point and the list of pages (routes)
+│       ├── api.js                  every fetch() call to the backend
+│       ├── useLoad.js  utils.js    data-loading hook, money/date formatting
+│       ├── styles.css              the whole look (tokens, sidebar, tables, bill, print)
+│       ├── components/             Layout (sidebar), Toast, Badge, Icon, PageHeader, StatCard, BillView, MedicineForm
+│       └── pages/                  Dashboard, Medicines, MedicineDetail, MedicineNew, Suppliers, Purchase, Sale, Reports
 └── docs/                        design and viva material
     ├── er_diagram.md               ER diagram (Mermaid) + explanation
     ├── normalization.md            UNF -> 1NF -> 2NF -> 3NF and the 3NF proof
@@ -108,6 +113,7 @@ pharmacy-inventory-system/
 ### Step 1 - Install the tools (once)
 * **MySQL Server 8** (8.0 or 8.4) and optionally MySQL Workbench - <https://dev.mysql.com/downloads/>. Remember the password you set for `root`.
 * **Python 3.10 or newer** - <https://www.python.org/downloads/> (tick "Add Python to PATH" on Windows).
+* **Node.js 20 or newer** - <https://nodejs.org/> (for the React frontend).
 
 ### Step 2 - Build the database
 Open a terminal **inside the `database` folder** and run:
@@ -151,9 +157,17 @@ uvicorn main:app --reload            # start the server on http://127.0.0.1:8000
 Open <http://127.0.0.1:8000/health> - you should see `{"status":"ok","database":"connected"}`.
 Open <http://127.0.0.1:8000/docs> to try every endpoint in the browser (automatic API documentation).
 
-### Step 4 - Open the website
-Double-click **`frontend/index.html`** (or drag it into your browser). It shows the dashboard.
-(If you prefer a web server: `cd frontend` then `python -m http.server 5500` and open <http://127.0.0.1:5500>.)
+### Step 4 - Start the website (React)
+Open a **second** terminal (leave the backend running) and run:
+
+```bash
+cd pharmacy-inventory-system/frontend
+npm install          # once: downloads React, react-router and Vite (needs Node.js 20 or newer)
+npm run dev          # starts the website on http://127.0.0.1:5173
+```
+
+Open <http://127.0.0.1:5173> in your browser. It shows the dashboard.
+(If the backend is not at `http://127.0.0.1:8000`, copy `frontend/.env.example` to `frontend/.env` and change `VITE_API_URL`.)
 
 Things to try:
 1. **Sale** page: add *Paracetamol 500mg x 40* -> Generate bill. Look at the batches: the bill takes 31 units from the batch that expires first and 9 from the next one (FEFO).
@@ -202,7 +216,7 @@ failure cases (selling expired stock and so on). Run `run_all.sql` again afterwa
 | `SOURCE` does nothing / error in Workbench | `SOURCE` works only in the `mysql` command-line client, started from the `database` folder. In Workbench run the files one by one. |
 | `SET GLOBAL event_scheduler` fails | Use the `root` account, or ask your admin; or press **Refresh alerts** on the dashboard instead. |
 | Alerts are not created every day | The scheduler is OFF after a server restart. `SET GLOBAL event_scheduler = ON;` (or `SET PERSIST ...`). Check: `SHOW VARIABLES LIKE 'event_scheduler';` |
-| Port 8000 already in use | `uvicorn main:app --reload --port 8001` and change `API_BASE` at the top of `frontend/js/api.js`. |
+| Port 8000 already in use | `uvicorn main:app --reload --port 8001` and set `VITE_API_URL=http://127.0.0.1:8001` in `frontend/.env` and restart `npm run dev`. |
 | `venv\Scripts\activate` is blocked in PowerShell | Run `Set-ExecutionPolicy -Scope Process Bypass` first, or use Command Prompt (`cmd`). |
 | Numbers on the dashboard differ from the README | The sample data uses today's date; counts stay the same, the dates move. After testing, run `run_all.sql` to reset. |
 
