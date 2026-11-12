@@ -110,6 +110,13 @@ pharmacy-inventory-system/
 
 ## 6. Setup - step by step
 
+> **Windows shortcut:** after Step 1 you can skip Steps 2 to 4 and double-click **`run_project.bat`**.
+> On the first run it creates `backend\.env` (Notepad opens so you can type your MySQL password),
+> installs the Python and npm packages, offers to build the database, starts the backend and the
+> website in their own windows and opens the browser. Later runs just start everything.
+> `run_project.bat db` rebuilds the database with the sample data first (it asks you to type YES,
+> because it deletes `pharmacy_db`). `run_project.bat stop` closes the backend and website windows.
+
 ### Step 1 - Install the tools (once)
 * **MySQL Server 8** (8.0 or 8.4) and optionally MySQL Workbench - <https://dev.mysql.com/downloads/>. Remember the password you set for `root`.
 * **Python 3.10 or newer** - <https://www.python.org/downloads/> (tick "Add Python to PATH" on Windows).

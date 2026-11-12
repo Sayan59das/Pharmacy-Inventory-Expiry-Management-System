@@ -1,0 +1,7 @@
+# =====================================================================
+# FILE        : .gitattributes
+# WHAT IT DOES: Tells Git how to store line endings. Windows batch files MUST keep
+#               Windows (CRLF) line endings, otherwise "goto" labels can break.
+# USED BY     : Git.
+# =====================================================================
+*.bat text eol=crlf
